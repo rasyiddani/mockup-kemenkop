@@ -1,0 +1,2462 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KDKMP - Dashboard Pengaduan Koperasi</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        :root {
+            --primary: #1B8A6B;
+            --primary-light: #22A77E;
+            --primary-dark: #147357;
+            --accent: #F5A623;
+            --accent-light: #FFD280;
+            --danger: #E74C3C;
+            --warning: #F39C12;
+            --success: #27AE60;
+            --info: #3498DB;
+            --bg-main: #F8FAFB;
+            --bg-card: #FFFFFF;
+            --text-primary: #1A1F36;
+            --text-secondary: #6B7280;
+            --text-muted: #9CA3AF;
+            --border: #E5E7EB;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+            --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg-main);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Dashboard Layout */
+        .dashboard {
+            display: flex;
+            min-height: 100vh;
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: white;
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            z-index: 100;
+            transition: transform 0.3s;
+        }
+
+        .sidebar-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sidebar-logo img {
+            height: 42px;
+        }
+
+        .sidebar-logo span {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 16px 12px;
+            overflow-y: auto;
+        }
+
+        .nav-section {
+            margin-bottom: 24px;
+        }
+
+        .nav-section-title {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            padding: 0 12px;
+            margin-bottom: 8px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .nav-item:hover {
+            background: var(--bg-main);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(27, 138, 107, 0.3);
+        }
+
+        .nav-item svg {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+        }
+
+        .nav-item .badge {
+            margin-left: auto;
+            background: var(--accent);
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+
+        .nav-item.active .badge {
+            background: white;
+            color: var(--primary);
+        }
+
+        .sidebar-footer {
+            padding: 16px;
+            border-top: 1px solid var(--border);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: var(--bg-main);
+            border-radius: var(--radius-md);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .user-details {
+            flex: 1;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-primary);
+        }
+
+        .user-role {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            padding: 20px 32px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .header-left h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-left h1 .wave {
+            font-size: 28px;
+        }
+
+        .header-left p {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .btn-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius-md);
+            border: none;
+            background: var(--bg-main);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .btn-icon:hover {
+            background: var(--border);
+            color: var(--text-primary);
+        }
+
+        .btn-icon .notification-dot {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 8px;
+            height: 8px;
+            background: var(--danger);
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+
+        /* Page Content */
+        .page-content {
+            padding: 32px;
+        }
+
+        .page {
+            display: none;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* KPI Cards */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .kpi-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .kpi-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .kpi-icon.blue { background: #EBF5FF; color: #3B82F6; }
+        .kpi-icon.pink { background: #FDF2F8; color: #EC4899; }
+        .kpi-icon.orange { background: #FFF7ED; color: #F97316; }
+        .kpi-icon.purple { background: #F5F3FF; color: #8B5CF6; }
+        .kpi-icon.green { background: #ECFDF5; color: #10B981; }
+
+        .kpi-icon svg {
+            width: 28px;
+            height: 28px;
+        }
+
+        .kpi-info {
+            flex: 1;
+        }
+
+        .kpi-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .kpi-value {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--text-primary);
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .kpi-trend {
+            font-size: 12px;
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .kpi-trend.up { color: var(--success); }
+        .kpi-trend.down { color: var(--danger); }
+
+        /* Charts Section */
+        .chart-section {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 28px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+            margin-bottom: 32px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .section-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .chart-legend {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 4px;
+        }
+
+        .chart-filters {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .filter-select {
+            padding: 10px 16px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-family: inherit;
+            background: white;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .chart-container {
+            height: 320px;
+            position: relative;
+        }
+
+        /* Data Grid */
+        .data-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 24px;
+        }
+
+        /* Tables */
+        .table-container {
+            background: white;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        .table-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .table-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .table-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .search-input {
+            padding: 10px 16px;
+            padding-left: 40px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-family: inherit;
+            width: 240px;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%239CA3AF'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'/%3E%3C/svg%3E") no-repeat 12px center;
+            background-size: 20px;
+            transition: all 0.2s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background-color: white;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 4px 12px rgba(27, 138, 107, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: var(--bg-main);
+            color: var(--text-primary);
+            border: 2px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 16px 24px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--bg-main);
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            font-size: 14px;
+            color: var(--text-primary);
+        }
+
+        tr:hover td {
+            background: var(--bg-main);
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .status-badge.selesai { background: #D1FAE5; color: #059669; }
+        .status-badge.verifikasi { background: #FEF3C7; color: #D97706; }
+        .status-badge.proses { background: #DBEAFE; color: #2563EB; }
+        .status-badge.ditolak { background: #FEE2E2; color: #DC2626; }
+        .status-badge.breach { background: #FEE2E2; color: #DC2626; }
+        .status-badge.warning { background: #FEF3C7; color: #D97706; }
+        .status-badge.on-track { background: #D1FAE5; color: #059669; }
+
+        .action-btn {
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid var(--border);
+            background: white;
+            color: var(--text-primary);
+        }
+
+        .action-btn:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        /* SLA Cards */
+        .sla-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .sla-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+        }
+
+        .sla-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .sla-card-title {
+            font-weight: 700;
+            font-size: 16px;
+            color: var(--text-primary);
+        }
+
+        .sla-percentage {
+            font-size: 36px;
+            font-weight: 800;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .sla-percentage.high { color: var(--success); }
+        .sla-percentage.medium { color: var(--warning); }
+        .sla-percentage.low { color: var(--danger); }
+
+        .progress-bar {
+            height: 8px;
+            background: var(--bg-main);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 16px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.6s ease-out;
+        }
+
+        .progress-fill.high { background: linear-gradient(90deg, #10B981, #34D399); }
+        .progress-fill.medium { background: linear-gradient(90deg, #F59E0B, #FBBF24); }
+        .progress-fill.low { background: linear-gradient(90deg, #EF4444, #F87171); }
+
+        /* Map Section */
+        .map-section {
+            background: white;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        .map-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        #indonesia-map {
+            height: 500px;
+            width: 100%;
+        }
+
+        .map-legend {
+            padding: 16px 24px;
+            background: var(--bg-main);
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .map-legend-title {
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .map-legend-items {
+            display: flex;
+            gap: 16px;
+        }
+
+        .map-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .map-legend-color {
+            width: 20px;
+            height: 12px;
+            border-radius: 2px;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 0;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.2s;
+            background: none;
+            border-top: none;
+            border-left: none;
+            border-right: none;
+        }
+
+        .tab:hover {
+            color: var(--text-primary);
+        }
+
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        /* Stat Boxes */
+        .stat-boxes {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-box {
+            background: white;
+            border-radius: var(--radius-md);
+            padding: 20px;
+            border: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .stat-box-value {
+            font-size: 32px;
+            font-weight: 800;
+            font-family: 'Space Grotesk', sans-serif;
+            color: var(--primary);
+        }
+
+        .stat-box-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        /* Export Dropdown */
+        .dropdown {
+            position: relative;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 8px;
+            background: white;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border);
+            padding: 8px;
+            min-width: 160px;
+            z-index: 100;
+            display: none;
+        }
+
+        .dropdown-menu.show {
+            display: block;
+            animation: dropdownFade 0.2s ease-out;
+        }
+
+        @keyframes dropdownFade {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .dropdown-item {
+            padding: 10px 16px;
+            font-size: 14px;
+            color: var(--text-primary);
+            cursor: pointer;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.2s;
+        }
+
+        .dropdown-item:hover {
+            background: var(--bg-main);
+        }
+
+        /* Audit Log */
+        .log-item {
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+        }
+
+        .log-item:last-child {
+            border-bottom: none;
+        }
+
+        .log-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .log-icon.create { background: #D1FAE5; color: #059669; }
+        .log-icon.update { background: #DBEAFE; color: #2563EB; }
+        .log-icon.delete { background: #FEE2E2; color: #DC2626; }
+
+        .log-content {
+            flex: 1;
+        }
+
+        .log-title {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-primary);
+        }
+
+        .log-description {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .log-time {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 8px;
+        }
+
+        /* Tooltip */
+        .leaflet-tooltip {
+            background: white;
+            border: none;
+            box-shadow: var(--shadow-lg);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .tooltip-title {
+            font-weight: 700;
+            font-size: 14px;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .tooltip-stat {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            margin-bottom: 4px;
+        }
+
+        .tooltip-stat-label {
+            color: var(--text-secondary);
+        }
+
+        .tooltip-stat-value {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Access Denied Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal {
+            background: white;
+            border-radius: var(--radius-xl);
+            padding: 48px;
+            max-width: 400px;
+            text-align: center;
+            animation: modalPop 0.3s ease-out;
+        }
+
+        @keyframes modalPop {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .modal-icon {
+            width: 80px;
+            height: 80px;
+            background: #FEE2E2;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            color: var(--danger);
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+
+        .modal-text {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+        }
+
+        /* Role Badge */
+        .role-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background: var(--bg-main);
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .role-badge.pusat { background: #DBEAFE; color: #2563EB; }
+        .role-badge.daerah { background: #FEF3C7; color: #D97706; }
+
+        /* Read-only Indicator */
+        .read-only-banner {
+            background: linear-gradient(90deg, #FEF3C7, #FDE68A);
+            padding: 12px 24px;
+            text-align: center;
+            font-size: 14px;
+            color: #92400E;
+            font-weight: 500;
+            display: none;
+        }
+
+        .read-only-banner.show {
+            display: block;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .kpi-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .kpi-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .data-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header {
+                padding: 16px;
+            }
+
+            .page-content {
+                padding: 16px;
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            .sidebar, .header, .btn, .search-input, .filter-select {
+                display: none !important;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .page-content {
+                padding: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Access Denied Modal -->
+    <div class="modal-overlay" id="accessDeniedModal">
+        <div class="modal">
+            <div class="modal-icon">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M15 9l-6 6M9 9l6 6"/>
+                </svg>
+            </div>
+            <h3 class="modal-title">Akses Ditolak</h3>
+            <p class="modal-text">Anda tidak memiliki akses ke fitur ini. Silakan hubungi administrator untuk informasi lebih lanjut.</p>
+            <button class="btn btn-primary" onclick="closeAccessDeniedModal()">Tutup</button>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div class="dashboard" id="dashboard">
+        <!-- Read-only Banner -->
+        <div class="read-only-banner" id="readOnlyBanner">
+            ⚠️ Anda sedang mengakses sebagai Pengelola Daerah (Read-Only untuk Dashboard Nasional)
+        </div>
+
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <img src="logo_kop.png" alt="Logo">
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Menu Utama</div>
+                    <div class="nav-item active" data-page="beranda">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+                            <polyline points="9 22 9 12 15 12 15 22"/>
+                        </svg>
+                        <span>Beranda</span>
+                    </div>
+                    <div class="nav-item" data-page="pengaduan" onclick="window.location.href='admin-pengaduan.html'">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                            <line x1="16" y1="13" x2="8" y2="13"/>
+                            <line x1="16" y1="17" x2="8" y2="17"/>
+                        </svg>
+                        <span>Pengaduan</span>
+                        <span class="badge">140</span>
+                    </div>
+                    <div class="nav-item" data-page="sla">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <polyline points="12 6 12 12 16 14"/>
+                        </svg>
+                        <span>SLA Monitoring</span>
+                    </div>
+                    <div class="nav-item" data-page="statistik">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="20" x2="18" y2="10"/>
+                            <line x1="12" y1="20" x2="12" y2="4"/>
+                            <line x1="6" y1="20" x2="6" y2="14"/>
+                        </svg>
+                        <span>Statistik</span>
+                    </div>
+                    <div class="nav-item" data-page="peta">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/>
+                            <line x1="8" y1="2" x2="8" y2="18"/>
+                            <line x1="16" y1="6" x2="16" y2="22"/>
+                        </svg>
+                        <span>Peta Pengaduan</span>
+                    </div>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Administrasi</div>
+                    <div class="nav-item" data-page="audit">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                        </svg>
+                        <span>Audit Log</span>
+                    </div>
+                    <div class="nav-item" data-page="pengaturan">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="3"/>
+                            <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/>
+                        </svg>
+                        <span>Pengaturan</span>
+                    </div>
+                </div>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar">A</div>
+                    <div class="user-details">
+                        <div class="user-name" id="userName">Admin 1</div>
+                        <div class="user-role"><span class="role-badge pusat" id="userRole">Pengelola Pusat</span></div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="header">
+                <div class="header-left">
+                    <h1>Halo, Admin! <span class="wave">👋</span></h1>
+                </div>
+                <div class="header-actions">
+                    <button class="btn-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                            <path d="M13.73 21a2 2 0 01-3.46 0"/>
+                        </svg>
+                        <span class="notification-dot"></span>
+                    </button>
+                    <button class="btn-icon" onclick="toggleSidebar()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="3" y1="12" x2="21" y2="12"/>
+                            <line x1="3" y1="6" x2="21" y2="6"/>
+                            <line x1="3" y1="18" x2="21" y2="18"/>
+                        </svg>
+                    </button>
+                </div>
+            </header>
+
+            <div class="page-content">
+                <!-- Beranda Page -->
+                <div class="page active" id="page-beranda">
+                    <div class="kpi-grid">
+                        <div class="kpi-card">
+                            <div class="kpi-icon blue">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                                    <polyline points="14 2 14 8 20 8"/>
+                                </svg>
+                            </div>
+                            <div class="kpi-info">
+                                <div class="kpi-label">Pengaduan Baru Hari Ini</div>
+                                <div class="kpi-value">100</div>
+                                <div class="kpi-trend up">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M7 14l5-5 5 5z"/></svg>
+                                    +12% dari kemarin
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="kpi-card">
+                            <div class="kpi-icon pink">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                                    <path d="M9 12l2 2 4-4"/>
+                                </svg>
+                            </div>
+                            <div class="kpi-info">
+                                <div class="kpi-label">Menunggu Verifikasi</div>
+                                <div class="kpi-value">40</div>
+                                <div class="kpi-trend down">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M7 10l5 5 5-5z"/></svg>
+                                    -5% dari kemarin
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="kpi-card">
+                            <div class="kpi-icon orange">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                                </svg>
+                            </div>
+                            <div class="kpi-info">
+                                <div class="kpi-label">Sedang Diproses</div>
+                                <div class="kpi-value">110</div>
+                                <div class="kpi-trend up">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M7 14l5-5 5 5z"/></svg>
+                                    +8% dari kemarin
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="kpi-card">
+                            <div class="kpi-icon purple">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="1 4 1 10 7 10"/>
+                                    <path d="M3.51 15a9 9 0 102.13-9.36L1 10"/>
+                                </svg>
+                            </div>
+                            <div class="kpi-info">
+                                <div class="kpi-label">Pengajuan Ulang</div>
+                                <div class="kpi-value">10</div>
+                                <div class="kpi-trend down">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M7 10l5 5 5-5z"/></svg>
+                                    -20% dari kemarin
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="kpi-card">
+                            <div class="kpi-icon green">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M22 11.08V12a10 10 0 11-5.93-9.14"/>
+                                    <polyline points="22 4 12 14.01 9 11.01"/>
+                                </svg>
+                            </div>
+                            <div class="kpi-info">
+                                <div class="kpi-label">Selesai Bulan Ini</div>
+                                <div class="kpi-value">285</div>
+                                <div class="kpi-trend up">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M7 14l5-5 5 5z"/></svg>
+                                    +15% dari bulan lalu
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="chart-section">
+                        <div class="section-header">
+                            <div>
+                                <h3 class="section-title">Grafik Tren Pengaduan</h3>
+                                <p class="section-subtitle">Berikut merupakan grafik pengaduan terbanyak berdasarkan kategori</p>
+                            </div>
+                            <div class="chart-filters">
+                                <div class="chart-legend">
+                                    <div class="legend-item">
+                                        <div class="legend-dot" style="background: #8B5CF6;"></div>
+                                        <span>Layanan</span>
+                                    </div>
+                                    <div class="legend-item">
+                                        <div class="legend-dot" style="background: #EF4444;"></div>
+                                        <span>SDM</span>
+                                    </div>
+                                    <div class="legend-item">
+                                        <div class="legend-dot" style="background: #3B82F6;"></div>
+                                        <span>Permodalan</span>
+                                    </div>
+                                    <div class="legend-item">
+                                        <div class="legend-dot" style="background: #10B981;"></div>
+                                        <span>Aset & Operasional</span>
+                                    </div>
+                                </div>
+                                <select class="filter-select" id="categoryFilter" onchange="updateTrendChart()">
+                                    <option value="all">Semua Kategori</option>
+                                    <option value="layanan">Layanan</option>
+                                    <option value="sdm">SDM</option>
+                                    <option value="permodalan">Permodalan</option>
+                                    <option value="aset">Aset & Operasional</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="trendChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pengaduan Page -->
+                <div class="page" id="page-pengaduan">
+                    <div class="tabs">
+                        <button class="tab active" data-tab="semua">Semua</button>
+                        <button class="tab" data-tab="verifikasi">Butuh Verifikasi</button>
+                        <button class="tab" data-tab="proses">Dalam Proses</button>
+                        <button class="tab" data-tab="mediasi">Proses Mediasi</button>
+                        <button class="tab" data-tab="ditolak">Ditolak</button>
+                        <button class="tab" data-tab="selesai">Selesai</button>
+                    </div>
+
+                    <div class="table-container">
+                        <div class="table-header">
+                            <h3 class="table-title">Manajemen Pengaduan</h3>
+                            <div class="table-actions">
+                                <input type="text" class="search-input" placeholder="Cari Kode Tiket...">
+                                <select class="filter-select">
+                                    <option value="">Kategori ▼</option>
+                                    <option value="simpan-pinjam">Simpan Pinjam</option>
+                                    <option value="manajemen">Manajemen / Kepengurusan</option>
+                                    <option value="kredit">Kredit Bermasalah</option>
+                                    <option value="aplikasi">Aplikasi / Sistem Layanan</option>
+                                    <option value="pelayanan">Pelayanan Koperasi</option>
+                                </select>
+                                <select class="filter-select">
+                                    <option value="">Status ▼</option>
+                                    <option value="selesai">Selesai</option>
+                                    <option value="verifikasi">Verifikasi</option>
+                                    <option value="proses">Dalam Proses</option>
+                                </select>
+                                <input type="date" class="filter-select">
+                                <button class="btn btn-primary">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="6 9 6 2 18 2 18 9"/>
+                                        <path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/>
+                                        <rect x="6" y="14" width="12" height="8"/>
+                                    </svg>
+                                    Print All
+                                </button>
+                            </div>
+                        </div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Kode Tiket</th>
+                                    <th>Kategori</th>
+                                    <th>Koperasi Tujuan</th>
+                                    <th>Lokasi</th>
+                                    <th>Ringkasan</th>
+                                    <th>Status</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="pengaduanTable">
+                                <!-- Dynamic content -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- SLA Monitoring Page -->
+                <div class="page" id="page-sla">
+                    <div class="sla-grid">
+                        <div class="sla-card">
+                            <div class="sla-card-header">
+                                <h3 class="sla-card-title">Kepatuhan SLA Keseluruhan</h3>
+                                <span class="status-badge on-track">On Track</span>
+                            </div>
+                            <div class="sla-percentage high">87.5%</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill high" style="width: 87.5%;"></div>
+                            </div>
+                        </div>
+
+                        <div class="sla-card">
+                            <div class="sla-card-header">
+                                <h3 class="sla-card-title">Rata-rata Waktu Resolusi</h3>
+                            </div>
+                            <div class="sla-percentage medium">4.2</div>
+                            <p style="color: var(--text-secondary); font-size: 14px; margin-top: 8px;">Hari kerja rata-rata</p>
+                        </div>
+
+                        <div class="sla-card">
+                            <div class="sla-card-header">
+                                <h3 class="sla-card-title">Pengaduan Breach SLA</h3>
+                                <span class="status-badge breach">Perlu Perhatian</span>
+                            </div>
+                            <div class="sla-percentage low">23</div>
+                            <p style="color: var(--text-secondary); font-size: 14px; margin-top: 8px;">Pengaduan melewati batas SLA</p>
+                        </div>
+                    </div>
+
+                    <!-- SLA Per Kategori Section -->
+                    <div class="chart-section" style="margin-bottom: 24px;">
+                        <div class="section-header">
+                            <div>
+                                <h3 class="section-title">SLA per Kategori Pengaduan</h3>
+                                <p class="section-subtitle">Perbandingan kepatuhan SLA berdasarkan kategori pengaduan</p>
+                            </div>
+                        </div>
+                        <div class="sla-grid" style="margin-bottom: 0;">
+                            <div class="sla-card" style="border-left: 4px solid #8B5CF6;">
+                                <div class="sla-card-header">
+                                    <h3 class="sla-card-title">Layanan</h3>
+                                    <span class="status-badge on-track">On Track</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+                                    <div>
+                                        <div class="sla-percentage high" style="font-size: 28px;">91%</div>
+                                        <p style="color: var(--text-secondary); font-size: 12px;">Kepatuhan SLA</p>
+                                    </div>
+                                    <div style="text-align: right;">
+                                        <div style="font-size: 18px; font-weight: 700; color: var(--text-primary);">3.2</div>
+                                        <p style="color: var(--text-secondary); font-size: 12px;">Hari Avg</p>
+                                    </div>
+                                </div>
+                                <div class="progress-bar" style="margin-top: 12px;">
+                                    <div class="progress-fill high" style="width: 91%; background: linear-gradient(90deg, #8B5CF6, #A78BFA);"></div>
+                                </div>
+                            </div>
+
+                            <div class="sla-card" style="border-left: 4px solid #EF4444;">
+                                <div class="sla-card-header">
+                                    <h3 class="sla-card-title">SDM</h3>
+                                    <span class="status-badge warning">Warning</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+                                    <div>
+                                        <div class="sla-percentage medium" style="font-size: 28px;">76%</div>
+                                        <p style="color: var(--text-secondary); font-size: 12px;">Kepatuhan SLA</p>
+                                    </div>
+                                    <div style="text-align: right;">
+                                        <div style="font-size: 18px; font-weight: 700; color: var(--text-primary);">5.1</div>
+                                        <p style="color: var(--text-secondary); font-size: 12px;">Hari Avg</p>
+                                    </div>
+                                </div>
+                                <div class="progress-bar" style="margin-top: 12px;">
+                                    <div class="progress-fill medium" style="width: 76%; background: linear-gradient(90deg, #EF4444, #F87171);"></div>
+                                </div>
+                            </div>
+
+                            <div class="sla-card" style="border-left: 4px solid #3B82F6;">
+                                <div class="sla-card-header">
+                                    <h3 class="sla-card-title">Permodalan</h3>
+                                    <span class="status-badge on-track">On Track</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+                                    <div>
+                                        <div class="sla-percentage high" style="font-size: 28px;">88%</div>
+                                        <p style="color: var(--text-secondary); font-size: 12px;">Kepatuhan SLA</p>
+                                    </div>
+                                    <div style="text-align: right;">
+                                        <div style="font-size: 18px; font-weight: 700; color: var(--text-primary);">3.8</div>
+                                        <p style="color: var(--text-secondary); font-size: 12px;">Hari Avg</p>
+                                    </div>
+                                </div>
+                                <div class="progress-bar" style="margin-top: 12px;">
+                                    <div class="progress-fill high" style="width: 88%; background: linear-gradient(90deg, #3B82F6, #60A5FA);"></div>
+                                </div>
+                            </div>
+
+                            <div class="sla-card" style="border-left: 4px solid #10B981;">
+                                <div class="sla-card-header">
+                                    <h3 class="sla-card-title">Aset & Operasional</h3>
+                                    <span class="status-badge breach">Breach</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+                                    <div>
+                                        <div class="sla-percentage low" style="font-size: 28px;">68%</div>
+                                        <p style="color: var(--text-secondary); font-size: 12px;">Kepatuhan SLA</p>
+                                    </div>
+                                    <div style="text-align: right;">
+                                        <div style="font-size: 18px; font-weight: 700; color: var(--text-primary);">6.2</div>
+                                        <p style="color: var(--text-secondary); font-size: 12px;">Hari Avg</p>
+                                    </div>
+                                </div>
+                                <div class="progress-bar" style="margin-top: 12px;">
+                                    <div class="progress-fill low" style="width: 68%; background: linear-gradient(90deg, #10B981, #34D399);"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SLA Category Comparison Chart -->
+                    <div class="data-grid" style="margin-bottom: 24px;">
+                        <div class="chart-section">
+                            <div class="section-header">
+                                <h3 class="section-title">Tren SLA per Kategori (6 Bulan)</h3>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="slaCategoryTrendChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="chart-section">
+                            <div class="section-header">
+                                <h3 class="section-title">Distribusi Breach per Kategori</h3>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="slaBreachChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="chart-section">
+                        <div class="section-header">
+                            <div>
+                                <h3 class="section-title">Perbandingan SLA Antar Daerah</h3>
+                                <p class="section-subtitle">Persentase kepatuhan SLA per provinsi</p>
+                            </div>
+                            <div class="chart-filters">
+                                <select class="filter-select" id="slaTimeFilter">
+                                    <option value="month">Bulan Ini</option>
+                                    <option value="quarter">Kuartal Ini</option>
+                                    <option value="year">Tahun Ini</option>
+                                </select>
+                                <select class="filter-select" id="slaRegionFilter">
+                                    <option value="">Semua Wilayah</option>
+                                    <option value="jawa">Pulau Jawa</option>
+                                    <option value="sumatera">Pulau Sumatera</option>
+                                    <option value="kalimantan">Pulau Kalimantan</option>
+                                    <option value="sulawesi">Pulau Sulawesi</option>
+                                </select>
+                                <div class="dropdown">
+                                    <button class="btn btn-secondary" onclick="toggleDropdown('slaExport')">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                                            <polyline points="7 10 12 15 17 10"/>
+                                            <line x1="12" y1="15" x2="12" y2="3"/>
+                                        </svg>
+                                        Export
+                                    </button>
+                                    <div class="dropdown-menu" id="slaExportDropdown">
+                                        <div class="dropdown-item" onclick="exportReport('pdf')">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                                                <polyline points="14 2 14 8 20 8"/>
+                                            </svg>
+                                            Export PDF
+                                        </div>
+                                        <div class="dropdown-item" onclick="exportReport('excel')">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                                                <line x1="3" y1="9" x2="21" y2="9"/>
+                                                <line x1="3" y1="15" x2="21" y2="15"/>
+                                                <line x1="9" y1="3" x2="9" y2="21"/>
+                                                <line x1="15" y1="3" x2="15" y2="21"/>
+                                            </svg>
+                                            Export Excel
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="slaComparisonChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="table-container" style="margin-top: 24px;">
+                        <div class="table-header">
+                            <h3 class="table-title">Detail SLA per Daerah</h3>
+                        </div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Daerah</th>
+                                    <th>Total Pengaduan</th>
+                                    <th>Rata-rata Resolusi</th>
+                                    <th>Kepatuhan SLA</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="slaTable">
+                                <!-- Dynamic content -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Detail SLA per Kategori Table -->
+                    <div class="table-container" style="margin-top: 24px;">
+                        <div class="table-header">
+                            <h3 class="table-title">Detail SLA per Kategori</h3>
+                        </div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Kategori</th>
+                                    <th>Total Pengaduan</th>
+                                    <th>Selesai Tepat Waktu</th>
+                                    <th>Breach SLA</th>
+                                    <th>Rata-rata Resolusi</th>
+                                    <th>Kepatuhan</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="slaCategoryTable">
+                                <tr>
+                                    <td><span style="display: inline-block; width: 12px; height: 12px; background: #8B5CF6; border-radius: 3px; margin-right: 8px;"></span><strong>Layanan</strong></td>
+                                    <td>420</td>
+                                    <td>382</td>
+                                    <td>38</td>
+                                    <td>3.2 hari</td>
+                                    <td>91%</td>
+                                    <td><span class="status-badge on-track">On Track</span></td>
+                                </tr>
+                                <tr>
+                                    <td><span style="display: inline-block; width: 12px; height: 12px; background: #EF4444; border-radius: 3px; margin-right: 8px;"></span><strong>SDM</strong></td>
+                                    <td>280</td>
+                                    <td>213</td>
+                                    <td>67</td>
+                                    <td>5.1 hari</td>
+                                    <td>76%</td>
+                                    <td><span class="status-badge warning">Warning</span></td>
+                                </tr>
+                                <tr>
+                                    <td><span style="display: inline-block; width: 12px; height: 12px; background: #3B82F6; border-radius: 3px; margin-right: 8px;"></span><strong>Permodalan</strong></td>
+                                    <td>320</td>
+                                    <td>282</td>
+                                    <td>38</td>
+                                    <td>3.8 hari</td>
+                                    <td>88%</td>
+                                    <td><span class="status-badge on-track">On Track</span></td>
+                                </tr>
+                                <tr>
+                                    <td><span style="display: inline-block; width: 12px; height: 12px; background: #10B981; border-radius: 3px; margin-right: 8px;"></span><strong>Aset & Operasional</strong></td>
+                                    <td>227</td>
+                                    <td>154</td>
+                                    <td>73</td>
+                                    <td>6.2 hari</td>
+                                    <td>68%</td>
+                                    <td><span class="status-badge breach">Breach</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Statistik Page -->
+                <div class="page" id="page-statistik">
+                    <div class="stat-boxes">
+                        <div class="stat-box">
+                            <div class="stat-box-value">1,247</div>
+                            <div class="stat-box-label">Total Pengaduan Tahun Ini</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-box-value">892</div>
+                            <div class="stat-box-label">Pengaduan Selesai</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-box-value">71.5%</div>
+                            <div class="stat-box-label">Tingkat Penyelesaian</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-box-value">3.8</div>
+                            <div class="stat-box-label">Hari Rata-rata Resolusi</div>
+                        </div>
+                    </div>
+
+                    <div class="data-grid">
+                        <div class="chart-section">
+                            <div class="section-header">
+                                <h3 class="section-title">Pengaduan per Kategori</h3>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="categoryChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="chart-section">
+                            <div class="section-header">
+                                <h3 class="section-title">Distribusi Status</h3>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="statusChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-container" style="margin-top: 24px;">
+                        <div class="table-header">
+                            <h3 class="table-title">Statistik per Wilayah</h3>
+                            <div class="table-actions">
+                                <input type="text" class="search-input" placeholder="Cari wilayah...">
+                                <div class="dropdown">
+                                    <button class="btn btn-primary" onclick="toggleDropdown('statExport')">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                                            <polyline points="7 10 12 15 17 10"/>
+                                            <line x1="12" y1="15" x2="12" y2="3"/>
+                                        </svg>
+                                        Export Laporan
+                                    </button>
+                                    <div class="dropdown-menu" id="statExportDropdown">
+                                        <div class="dropdown-item" onclick="exportReport('pdf')">Export PDF</div>
+                                        <div class="dropdown-item" onclick="exportReport('excel')">Export Excel</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Wilayah</th>
+                                    <th>Total</th>
+                                    <th>Baru</th>
+                                    <th>Valid</th>
+                                    <th>Proses</th>
+                                    <th>Selesai</th>
+                                </tr>
+                            </thead>
+                            <tbody id="wilayahTable">
+                                <!-- Dynamic content -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Peta Page -->
+                <div class="page" id="page-peta">
+                    <div class="map-section">
+                        <div class="map-header">
+                            <h3 class="section-title">Heatmap Pengaduan Indonesia</h3>
+                            <div class="chart-filters">
+                                <select class="filter-select" id="mapTimeFilter" onchange="updateMap()">
+                                    <option value="today">Hari Ini</option>
+                                    <option value="week">Minggu Ini</option>
+                                    <option value="month" selected>Bulan Ini</option>
+                                    <option value="year">Tahun Ini</option>
+                                </select>
+                                <button class="btn btn-secondary" onclick="refreshMap()">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="1 4 1 10 7 10"/>
+                                        <path d="M3.51 15a9 9 0 102.13-9.36L1 10"/>
+                                    </svg>
+                                    Refresh
+                                </button>
+                            </div>
+                        </div>
+                        <div id="indonesia-map" style="padding: 20px; background: linear-gradient(180deg, #E8F4FD 0%, #D4E8F7 100%);">
+                            <svg viewBox="0 0 1000 400" style="width: 100%; height: 450px;">
+                                <!-- Background -->
+                                <defs>
+                                    <linearGradient id="seaGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                        <stop offset="0%" style="stop-color:#E8F4FD"/>
+                                        <stop offset="100%" style="stop-color:#C5DFF0"/>
+                                    </linearGradient>
+                                    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+                                        <feDropShadow dx="2" dy="2" stdDeviation="3" flood-opacity="0.2"/>
+                                    </filter>
+                                </defs>
+                                
+                                <!-- Sumatera -->
+                                <g class="province" data-name="Sumatera" onclick="showProvinceDetail('Sumatera', 312, 78)">
+                                    <path d="M80,80 L120,60 L160,70 L180,100 L200,150 L190,200 L170,250 L140,280 L100,260 L70,220 L60,160 L70,120 Z" 
+                                          fill="#FEF3C7" stroke="#D97706" stroke-width="2" filter="url(#shadow)" style="cursor: pointer;">
+                                        <title>Sumatera - 312 Pengaduan</title>
+                                    </path>
+                                    <text x="130" y="170" text-anchor="middle" font-size="11" font-weight="600" fill="#92400E">Sumatera</text>
+                                    <circle cx="130" cy="190" r="18" fill="#F59E0B" stroke="white" stroke-width="2"/>
+                                    <text x="130" y="195" text-anchor="middle" font-size="10" font-weight="700" fill="white">312</text>
+                                </g>
+
+                                <!-- Kalimantan -->
+                                <g class="province" data-name="Kalimantan" onclick="showProvinceDetail('Kalimantan', 156, 72)">
+                                    <path d="M320,80 L380,60 L440,80 L460,120 L450,180 L420,220 L370,230 L330,200 L310,150 L320,100 Z" 
+                                          fill="#D1FAE5" stroke="#059669" stroke-width="2" filter="url(#shadow)" style="cursor: pointer;">
+                                        <title>Kalimantan - 156 Pengaduan</title>
+                                    </path>
+                                    <text x="380" y="140" text-anchor="middle" font-size="11" font-weight="600" fill="#065F46">Kalimantan</text>
+                                    <circle cx="380" cy="165" r="18" fill="#10B981" stroke="white" stroke-width="2"/>
+                                    <text x="380" y="170" text-anchor="middle" font-size="10" font-weight="700" fill="white">156</text>
+                                </g>
+
+                                <!-- Sulawesi -->
+                                <g class="province" data-name="Sulawesi" onclick="showProvinceDetail('Sulawesi', 189, 81)">
+                                    <path d="M520,70 L560,50 L590,70 L600,110 L580,160 L600,200 L580,240 L550,230 L530,190 L540,140 L520,100 Z" 
+                                          fill="#FEF3C7" stroke="#D97706" stroke-width="2" filter="url(#shadow)" style="cursor: pointer;">
+                                        <title>Sulawesi - 189 Pengaduan</title>
+                                    </path>
+                                    <text x="560" y="130" text-anchor="middle" font-size="11" font-weight="600" fill="#92400E">Sulawesi</text>
+                                    <circle cx="560" cy="155" r="18" fill="#F59E0B" stroke="white" stroke-width="2"/>
+                                    <text x="560" y="160" text-anchor="middle" font-size="10" font-weight="700" fill="white">189</text>
+                                </g>
+
+                                <!-- Jawa -->
+                                <g class="province" data-name="Jawa" onclick="showProvinceDetail('Jawa', 654, 92)">
+                                    <path d="M200,280 L280,270 L360,275 L400,285 L380,310 L320,320 L250,315 L200,300 Z" 
+                                          fill="#FECACA" stroke="#DC2626" stroke-width="2" filter="url(#shadow)" style="cursor: pointer;">
+                                        <title>Jawa - 654 Pengaduan</title>
+                                    </path>
+                                    <text x="290" y="295" text-anchor="middle" font-size="11" font-weight="600" fill="#991B1B">Jawa</text>
+                                    <circle cx="290" cy="275" r="20" fill="#EF4444" stroke="white" stroke-width="2"/>
+                                    <text x="290" y="280" text-anchor="middle" font-size="11" font-weight="700" fill="white">654</text>
+                                </g>
+
+                                <!-- Bali & Nusa Tenggara -->
+                                <g class="province" data-name="Bali & Nusa Tenggara" onclick="showProvinceDetail('Bali & Nusa Tenggara', 145, 85)">
+                                    <path d="M420,300 L450,290 L520,295 L560,305 L550,325 L490,330 L430,320 Z" 
+                                          fill="#D1FAE5" stroke="#059669" stroke-width="2" filter="url(#shadow)" style="cursor: pointer;">
+                                        <title>Bali & Nusa Tenggara - 145 Pengaduan</title>
+                                    </path>
+                                    <text x="485" y="312" text-anchor="middle" font-size="9" font-weight="600" fill="#065F46">Bali & NT</text>
+                                    <circle cx="485" cy="295" r="16" fill="#10B981" stroke="white" stroke-width="2"/>
+                                    <text x="485" y="299" text-anchor="middle" font-size="9" font-weight="700" fill="white">145</text>
+                                </g>
+
+                                <!-- Maluku -->
+                                <g class="province" data-name="Maluku" onclick="showProvinceDetail('Maluku', 67, 79)">
+                                    <path d="M650,120 L700,100 L740,120 L750,160 L730,200 L690,210 L660,190 L650,150 Z" 
+                                          fill="#D1FAE5" stroke="#059669" stroke-width="2" filter="url(#shadow)" style="cursor: pointer;">
+                                        <title>Maluku - 67 Pengaduan</title>
+                                    </path>
+                                    <text x="700" y="150" text-anchor="middle" font-size="11" font-weight="600" fill="#065F46">Maluku</text>
+                                    <circle cx="700" cy="170" r="16" fill="#10B981" stroke="white" stroke-width="2"/>
+                                    <text x="700" y="174" text-anchor="middle" font-size="9" font-weight="700" fill="white">67</text>
+                                </g>
+
+                                <!-- Papua -->
+                                <g class="province" data-name="Papua" onclick="showProvinceDetail('Papua', 98, 68)">
+                                    <path d="M780,80 L850,60 L920,80 L950,130 L940,200 L900,250 L830,240 L790,200 L780,140 Z" 
+                                          fill="#D1FAE5" stroke="#059669" stroke-width="2" filter="url(#shadow)" style="cursor: pointer;">
+                                        <title>Papua - 98 Pengaduan</title>
+                                    </path>
+                                    <text x="860" y="145" text-anchor="middle" font-size="11" font-weight="600" fill="#065F46">Papua</text>
+                                    <circle cx="860" cy="170" r="18" fill="#10B981" stroke="white" stroke-width="2"/>
+                                    <text x="860" y="175" text-anchor="middle" font-size="10" font-weight="700" fill="white">98</text>
+                                </g>
+
+                                <!-- Compass -->
+                                <g transform="translate(920, 320)">
+                                    <circle cx="0" cy="0" r="25" fill="white" stroke="#CBD5E1" stroke-width="1"/>
+                                    <text x="0" y="-8" text-anchor="middle" font-size="12" font-weight="700" fill="#1E40AF">N</text>
+                                    <path d="M0,-18 L4,-5 L0,-10 L-4,-5 Z" fill="#1E40AF"/>
+                                </g>
+                            </svg>
+                        </div>
+                        <div class="map-legend">
+                            <span class="map-legend-title">Kepadatan Pengaduan:</span>
+                            <div class="map-legend-items">
+                                <div class="map-legend-item">
+                                    <div class="map-legend-color" style="background: #D1FAE5;"></div>
+                                    <span>Rendah (0-200)</span>
+                                </div>
+                                <div class="map-legend-item">
+                                    <div class="map-legend-color" style="background: #FEF3C7;"></div>
+                                    <span>Sedang (201-400)</span>
+                                </div>
+                                <div class="map-legend-item">
+                                    <div class="map-legend-color" style="background: #FECACA;"></div>
+                                    <span>Tinggi (400+)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Province Detail Modal -->
+                    <div id="provinceModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; align-items: center; justify-content: center;">
+                        <div style="background: white; padding: 32px; border-radius: 16px; max-width: 400px; width: 90%;">
+                            <h3 id="modalTitle" style="font-size: 20px; font-weight: 700; margin-bottom: 20px;"></h3>
+                            <div id="modalContent"></div>
+                            <button class="btn btn-primary" style="margin-top: 20px; width: 100%;" onclick="closeProvinceModal()">Tutup</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Audit Log Page -->
+                <div class="page" id="page-audit">
+                    <div class="table-container">
+                        <div class="table-header">
+                            <h3 class="table-title">Audit Log - Riwayat Aktivitas</h3>
+                            <div class="table-actions">
+                                <input type="text" class="search-input" placeholder="Cari aktivitas...">
+                                <select class="filter-select">
+                                    <option value="">Semua Aksi</option>
+                                    <option value="create">Create</option>
+                                    <option value="update">Update</option>
+                                    <option value="delete">Delete</option>
+                                </select>
+                                <input type="date" class="filter-select">
+                            </div>
+                        </div>
+                        <div id="auditLogContainer">
+                            <!-- Dynamic content -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pengaturan Page -->
+                <div class="page" id="page-pengaturan">
+                    <div class="chart-section">
+                        <h3 class="section-title" style="margin-bottom: 24px;">Pengaturan Akun</h3>
+                        <div class="form-group">
+                            <label>Nama Lengkap</label>
+                            <input type="text" value="Admin 1" placeholder="Masukkan nama lengkap">
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" value="admin@kemenkop.go.id" placeholder="Masukkan email">
+                        </div>
+                        <div class="form-group">
+                            <label>Password Baru</label>
+                            <input type="password" placeholder="Masukkan password baru">
+                        </div>
+                        <button class="btn btn-primary">Simpan Perubahan</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // =====================
+        // DATA
+        // =====================
+        const pengaduanData = [
+            { no: 1, kode: '#KP-2025-0142', kategori: 'Simpan Pinjam', koperasi: 'Koperasi Maju Sejahtera – Kab. Bandung', lokasi: 'Desa Wonogiri, Jawa Tengah', ringkasan: 'Pengaduan terkait penarikan simpanan...', status: 'selesai' },
+            { no: 2, kode: '#KP-2025-0138', kategori: 'Manajemen / Kepengurusan', koperasi: 'Koperasi Harapan Bersama – Kota Bekasi', lokasi: 'Desa Wonogiri, Jawa Tengah', ringkasan: 'Pelapor melaporkan adanya dugaan p...', status: 'verifikasi' },
+            { no: 3, kode: '#KP-2025-0125', kategori: 'Kredit Bermasalah', koperasi: 'Koperasi Mandiri Jaya – Kab. Gresik', lokasi: 'Desa Wonogiri, Jawa Tengah', ringkasan: 'Pelapor mengajukan keberatan meng...', status: 'verifikasi' },
+            { no: 4, kode: '#KP-2025-0119', kategori: 'Aplikasi / Sistem Layanan', koperasi: 'Koperasi Nusantara Digital – Kota Semarang', lokasi: 'Desa Wonogiri, Jawa Tengah', ringkasan: 'Laporan terkait error pada aplikasi, na...', status: 'verifikasi' },
+            { no: 5, kode: '#KP-2025-0103', kategori: 'Pelayanan Koperasi', koperasi: 'Koperasi Mandala Sentosa – Kab. Tangerang', lokasi: 'Desa Wonogiri, Jawa Tengah', ringkasan: 'Pelapor mengeluhkan respon lambat te...', status: 'verifikasi' },
+            { no: 6, kode: '#KP-2025-0098', kategori: 'Pelayanan Koperasi', koperasi: 'Koperasi Mandala Sentosa – Kab. Tangerang', lokasi: 'Desa Wonogiri, Jawa Tengah', ringkasan: 'Pelapor mengeluhkan respon lambat te...', status: 'proses' },
+            { no: 7, kode: '#KP-2025-0092', kategori: 'Pelayanan Koperasi', koperasi: 'Koperasi Mandala Sentosa – Kab. Tangerang', lokasi: 'Desa Wonogiri, Jawa Tengah', ringkasan: 'Pelapor mengeluhkan respon lambat te...', status: 'selesai' },
+        ];
+
+        const slaData = [
+            { daerah: 'Jawa Barat', total: 245, avgResolusi: '3.2 hari', kepatuhan: 92, status: 'on-track' },
+            { daerah: 'Jawa Tengah', total: 189, avgResolusi: '4.1 hari', kepatuhan: 85, status: 'on-track' },
+            { daerah: 'Jawa Timur', total: 210, avgResolusi: '3.8 hari', kepatuhan: 88, status: 'on-track' },
+            { daerah: 'DKI Jakarta', total: 156, avgResolusi: '2.9 hari', kepatuhan: 94, status: 'on-track' },
+            { daerah: 'Sumatera Utara', total: 98, avgResolusi: '5.2 hari', kepatuhan: 72, status: 'warning' },
+            { daerah: 'Sulawesi Selatan', total: 67, avgResolusi: '6.1 hari', kepatuhan: 65, status: 'breach' },
+            { daerah: 'Kalimantan Timur', total: 45, avgResolusi: '4.8 hari', kepatuhan: 78, status: 'warning' },
+        ];
+
+        const wilayahData = [
+            { wilayah: 'Jawa Barat', total: 245, baru: 32, valid: 45, proses: 68, selesai: 100 },
+            { wilayah: 'Jawa Tengah', total: 189, baru: 25, valid: 38, proses: 52, selesai: 74 },
+            { wilayah: 'Jawa Timur', total: 210, baru: 28, valid: 42, proses: 58, selesai: 82 },
+            { wilayah: 'DKI Jakarta', total: 156, baru: 18, valid: 30, proses: 45, selesai: 63 },
+            { wilayah: 'Sumatera Utara', total: 98, baru: 15, valid: 22, proses: 28, selesai: 33 },
+            { wilayah: 'Bali', total: 78, baru: 10, valid: 18, proses: 22, selesai: 28 },
+        ];
+
+        const auditLogs = [
+            { type: 'update', title: 'Status Pengaduan Diperbarui', desc: 'Admin 1 mengubah status pengaduan #KP-2025-0142 menjadi "Selesai"', time: '5 menit yang lalu' },
+            { type: 'create', title: 'Pengaduan Baru Masuk', desc: 'Pengaduan baru #KP-2025-0156 telah diterima dari Koperasi Maju Jaya', time: '15 menit yang lalu' },
+            { type: 'update', title: 'Verifikasi Pengaduan', desc: 'Admin 2 memverifikasi pengaduan #KP-2025-0138', time: '1 jam yang lalu' },
+            { type: 'delete', title: 'Pengaduan Dibatalkan', desc: 'Pengaduan #KP-2025-0089 dibatalkan oleh pelapor', time: '2 jam yang lalu' },
+            { type: 'create', title: 'Pengguna Baru Terdaftar', desc: 'Pengguna baru "Admin 3" ditambahkan ke sistem', time: '3 jam yang lalu' },
+            { type: 'update', title: 'SLA Breach Alert', desc: 'Pengaduan #KP-2025-0102 melewati batas SLA', time: '4 jam yang lalu' },
+        ];
+
+        // =====================
+        // USER & INIT
+        // =====================
+        let currentUser = {
+            username: 'admin',
+            role: 'pusat',
+            name: 'Admin Pusat'
+        };
+
+        // Initialize on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            // Update user info
+            document.getElementById('userName').textContent = currentUser.name;
+            document.getElementById('userAvatar').textContent = currentUser.name.charAt(0);
+            
+            const roleEl = document.getElementById('userRole');
+            roleEl.textContent = 'Pengelola Pusat';
+            roleEl.className = 'role-badge pusat';
+
+            // Initialize charts and data
+            initCharts();
+            renderTables();
+        });
+
+        function checkAccess(feature) {
+            if (currentUser && currentUser.role === 'daerah' && feature === 'write') {
+                document.getElementById('accessDeniedModal').classList.add('show');
+                return false;
+            }
+            return true;
+        }
+
+        function closeAccessDeniedModal() {
+            document.getElementById('accessDeniedModal').classList.remove('show');
+        }
+
+        // =====================
+        // NAVIGATION
+        // =====================
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                const page = this.dataset.page;
+                
+                // Skip if redirecting to external page
+                if (page === 'pengaduan') return;
+                
+                // Update active nav
+                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Update page
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                document.getElementById(`page-${page}`).classList.add('active');
+
+                // Update header
+                const titles = {
+                    'beranda': 'Halo, Admin! 👋',
+                    'pengaduan': 'Manajemen Pengaduan',
+                    'sla': 'SLA Monitoring',
+                    'statistik': 'Statistik & Analitik',
+                    'peta': 'Peta Pengaduan',
+                    'audit': 'Audit Log',
+                    'pengaturan': 'Pengaturan'
+                };
+                document.querySelector('.header-left h1').innerHTML = titles[page] || 'Dashboard';
+            });
+        });
+
+        // Tabs
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+        }
+
+        // =====================
+        // CHARTS
+        // =====================
+        let trendChart, slaChart, categoryChart, statusChart, slaCategoryTrendChart, slaBreachChart;
+
+        function initCharts() {
+            // Trend Chart
+            const trendCtx = document.getElementById('trendChart').getContext('2d');
+            trendChart = new Chart(trendCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Des'],
+                    datasets: [{
+                        label: 'Layanan',
+                        data: [20, 95, 110, 170, 130, 55, 130, 160, 90, 55, 95, 120, 160],
+                        borderColor: '#8B5CF6',
+                        backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(0,0,0,0.05)' }
+                        },
+                        x: {
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+
+            // SLA Comparison Chart
+            const slaCtx = document.getElementById('slaComparisonChart').getContext('2d');
+            slaChart = new Chart(slaCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Jawa Barat', 'Jawa Tengah', 'Jawa Timur', 'DKI Jakarta', 'Sumatra Utara', 'Sulawesi Selatan', 'Kalimantan Timur'],
+                    datasets: [{
+                        label: 'Kepatuhan SLA (%)',
+                        data: [92, 85, 88, 94, 72, 65, 78],
+                        backgroundColor: [
+                            'rgba(16, 185, 129, 0.8)',
+                            'rgba(16, 185, 129, 0.8)',
+                            'rgba(16, 185, 129, 0.8)',
+                            'rgba(16, 185, 129, 0.8)',
+                            'rgba(245, 158, 11, 0.8)',
+                            'rgba(239, 68, 68, 0.8)',
+                            'rgba(245, 158, 11, 0.8)',
+                        ],
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            grid: { color: 'rgba(0,0,0,0.05)' }
+                        },
+                        x: {
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+
+            // SLA Category Trend Chart
+            const slaCatTrendCtx = document.getElementById('slaCategoryTrendChart').getContext('2d');
+            slaCategoryTrendChart = new Chart(slaCatTrendCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Des'],
+                    datasets: [
+                        {
+                            label: 'Layanan',
+                            data: [88, 89, 90, 91, 90, 91],
+                            borderColor: '#8B5CF6',
+                            backgroundColor: 'transparent',
+                            tension: 0.4,
+                            borderWidth: 3
+                        },
+                        {
+                            label: 'SDM',
+                            data: [72, 74, 73, 75, 74, 76],
+                            borderColor: '#EF4444',
+                            backgroundColor: 'transparent',
+                            tension: 0.4,
+                            borderWidth: 3
+                        },
+                        {
+                            label: 'Permodalan',
+                            data: [85, 86, 87, 88, 87, 88],
+                            borderColor: '#3B82F6',
+                            backgroundColor: 'transparent',
+                            tension: 0.4,
+                            borderWidth: 3
+                        },
+                        {
+                            label: 'Aset & Operasional',
+                            data: [65, 66, 67, 68, 67, 68],
+                            borderColor: '#10B981',
+                            backgroundColor: 'transparent',
+                            tension: 0.4,
+                            borderWidth: 3
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { padding: 20, usePointStyle: true }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            min: 50,
+                            max: 100,
+                            grid: { color: 'rgba(0,0,0,0.05)' }
+                        },
+                        x: {
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+
+            // SLA Breach Chart (Pie)
+            const slaBreachCtx = document.getElementById('slaBreachChart').getContext('2d');
+            slaBreachChart = new Chart(slaBreachCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Layanan', 'SDM', 'Permodalan', 'Aset & Operasional'],
+                    datasets: [{
+                        data: [38, 67, 38, 73],
+                        backgroundColor: ['#8B5CF6', '#EF4444', '#3B82F6', '#10B981'],
+                        borderWidth: 0,
+                        cutout: '60%'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { padding: 15, usePointStyle: true }
+                        }
+                    }
+                }
+            });
+
+            // Category Chart
+            const catCtx = document.getElementById('categoryChart').getContext('2d');
+            categoryChart = new Chart(catCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Layanan', 'SDM', 'Permodalan', 'Aset & Operasional'],
+                    datasets: [{
+                        data: [420, 280, 320, 227],
+                        backgroundColor: ['#8B5CF6', '#EF4444', '#3B82F6', '#10B981'],
+                        borderWidth: 0,
+                        cutout: '70%'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { padding: 20 }
+                        }
+                    }
+                }
+            });
+
+            // Status Chart
+            const statusCtx = document.getElementById('statusChart').getContext('2d');
+            statusChart = new Chart(statusCtx, {
+                type: 'pie',
+                data: {
+                    labels: ['Baru', 'Valid', 'Proses', 'Selesai'],
+                    datasets: [{
+                        data: [128, 195, 273, 651],
+                        backgroundColor: ['#3B82F6', '#F59E0B', '#8B5CF6', '#10B981'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { padding: 20 }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateTrendChart() {
+            const filter = document.getElementById('categoryFilter').value;
+            const datasets = {
+                'all': [{ data: [20, 95, 110, 170, 130, 55, 130, 160, 90, 55, 95, 120], borderColor: '#8B5CF6', backgroundColor: 'rgba(139, 92, 246, 0.1)' }],
+                'layanan': [{ data: [20, 95, 110, 170, 130, 55, 130, 160, 90, 55, 95, 120], borderColor: '#8B5CF6', backgroundColor: 'rgba(139, 92, 246, 0.1)' }],
+                'sdm': [{ data: [15, 45, 60, 80, 70, 35, 50, 65, 45, 30, 55, 70], borderColor: '#EF4444', backgroundColor: 'rgba(239, 68, 68, 0.1)' }],
+                'permodalan': [{ data: [30, 55, 75, 90, 85, 45, 70, 80, 60, 40, 65, 85], borderColor: '#3B82F6', backgroundColor: 'rgba(59, 130, 246, 0.1)' }],
+                'aset': [{ data: [10, 35, 50, 65, 55, 30, 45, 55, 40, 25, 40, 50], borderColor: '#10B981', backgroundColor: 'rgba(16, 185, 129, 0.1)' }]
+            };
+
+            const selected = datasets[filter] || datasets['all'];
+            trendChart.data.datasets = selected.map(d => ({
+                ...d,
+                fill: true,
+                tension: 0.4,
+                borderWidth: 2
+            }));
+            trendChart.update();
+        }
+
+        // =====================
+        // TABLES
+        // =====================
+        function renderTables() {
+            // Pengaduan Table
+            const pengaduanTable = document.getElementById('pengaduanTable');
+            pengaduanTable.innerHTML = pengaduanData.map(item => `
+                <tr>
+                    <td>${item.no}</td>
+                    <td><strong>${item.kode}</strong></td>
+                    <td>${item.kategori}</td>
+                    <td>${item.koperasi}</td>
+                    <td>${item.lokasi}</td>
+                    <td>${item.ringkasan}</td>
+                    <td><span class="status-badge ${item.status}">${item.status.charAt(0).toUpperCase() + item.status.slice(1)}</span></td>
+                    <td>
+                        <button class="action-btn" onclick="checkAccess('write')">Go</button>
+                    </td>
+                </tr>
+            `).join('');
+
+            // SLA Table
+            const slaTable = document.getElementById('slaTable');
+            slaTable.innerHTML = slaData.map(item => `
+                <tr>
+                    <td><strong>${item.daerah}</strong></td>
+                    <td>${item.total}</td>
+                    <td>${item.avgResolusi}</td>
+                    <td>${item.kepatuhan}%</td>
+                    <td><span class="status-badge ${item.status}">${item.status === 'on-track' ? 'On Track' : item.status === 'warning' ? 'Warning' : 'Breach'}</span></td>
+                </tr>
+            `).join('');
+
+            // Wilayah Table
+            const wilayahTable = document.getElementById('wilayahTable');
+            wilayahTable.innerHTML = wilayahData.map(item => `
+                <tr>
+                    <td><strong>${item.wilayah}</strong></td>
+                    <td>${item.total}</td>
+                    <td>${item.baru}</td>
+                    <td>${item.valid}</td>
+                    <td>${item.proses}</td>
+                    <td>${item.selesai}</td>
+                </tr>
+            `).join('');
+
+            // Audit Log
+            const auditContainer = document.getElementById('auditLogContainer');
+            auditContainer.innerHTML = auditLogs.map(log => `
+                <div class="log-item">
+                    <div class="log-icon ${log.type}">
+                        ${log.type === 'create' ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>' : 
+                          log.type === 'update' ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>' :
+                          '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>'}
+                    </div>
+                    <div class="log-content">
+                        <div class="log-title">${log.title}</div>
+                        <div class="log-description">${log.desc}</div>
+                        <div class="log-time">${log.time}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // =====================
+        // MAP (SVG)
+        // =====================
+        const provinceDetails = {
+            'Sumatera': { complaints: 312, sla: 78, selesai: 245, proses: 67, avgDays: 4.5 },
+            'Kalimantan': { complaints: 156, sla: 72, selesai: 112, proses: 44, avgDays: 5.2 },
+            'Sulawesi': { complaints: 189, sla: 81, selesai: 153, proses: 36, avgDays: 4.1 },
+            'Jawa': { complaints: 654, sla: 92, selesai: 601, proses: 53, avgDays: 3.2 },
+            'Bali & Nusa Tenggara': { complaints: 145, sla: 85, selesai: 123, proses: 22, avgDays: 3.8 },
+            'Maluku': { complaints: 67, sla: 79, selesai: 53, proses: 14, avgDays: 4.8 },
+            'Papua': { complaints: 98, sla: 68, selesai: 67, proses: 31, avgDays: 5.8 }
+        };
+
+        function showProvinceDetail(name, complaints, sla) {
+            const data = provinceDetails[name];
+            const modal = document.getElementById('provinceModal');
+            document.getElementById('modalTitle').textContent = name;
+            document.getElementById('modalContent').innerHTML = `
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div style="background: #F0FDF4; padding: 16px; border-radius: 12px; text-align: center;">
+                        <div style="font-size: 28px; font-weight: 800; color: #059669;">${data.complaints}</div>
+                        <div style="font-size: 12px; color: #065F46;">Total Pengaduan</div>
+                    </div>
+                    <div style="background: #EFF6FF; padding: 16px; border-radius: 12px; text-align: center;">
+                        <div style="font-size: 28px; font-weight: 800; color: #2563EB;">${data.sla}%</div>
+                        <div style="font-size: 12px; color: #1E40AF;">Kepatuhan SLA</div>
+                    </div>
+                    <div style="background: #F0FDF4; padding: 16px; border-radius: 12px; text-align: center;">
+                        <div style="font-size: 28px; font-weight: 800; color: #059669;">${data.selesai}</div>
+                        <div style="font-size: 12px; color: #065F46;">Selesai</div>
+                    </div>
+                    <div style="background: #FEF3C7; padding: 16px; border-radius: 12px; text-align: center;">
+                        <div style="font-size: 28px; font-weight: 800; color: #D97706;">${data.proses}</div>
+                        <div style="font-size: 12px; color: #92400E;">Dalam Proses</div>
+                    </div>
+                </div>
+                <div style="margin-top: 16px; padding: 16px; background: #F9FAFB; border-radius: 12px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <span style="color: #6B7280;">Rata-rata Resolusi:</span>
+                        <span style="font-weight: 600;">${data.avgDays} hari</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: #6B7280;">Status:</span>
+                        <span class="status-badge ${data.sla >= 85 ? 'on-track' : data.sla >= 70 ? 'warning' : 'breach'}">${data.sla >= 85 ? 'On Track' : data.sla >= 70 ? 'Warning' : 'Breach'}</span>
+                    </div>
+                </div>
+            `;
+            modal.style.display = 'flex';
+        }
+
+        function closeProvinceModal() {
+            document.getElementById('provinceModal').style.display = 'none';
+        }
+
+        function refreshMap() {
+            // Animate refresh
+            const provinces = document.querySelectorAll('.province');
+            provinces.forEach((p, i) => {
+                p.style.opacity = '0.5';
+                setTimeout(() => {
+                    p.style.opacity = '1';
+                }, i * 100);
+            });
+        }
+
+        function updateMap() {
+            refreshMap();
+        }
+
+        // =====================
+        // DROPDOWNS & EXPORT
+        // =====================
+        function toggleDropdown(id) {
+            const dropdown = document.getElementById(id + 'Dropdown');
+            dropdown.classList.toggle('show');
+        }
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.dropdown')) {
+                document.querySelectorAll('.dropdown-menu').forEach(d => d.classList.remove('show'));
+            }
+        });
+
+        function exportReport(type) {
+            if (!checkAccess('write')) return;
+            
+            alert(`Exporting as ${type.toUpperCase()}...`);
+            document.querySelectorAll('.dropdown-menu').forEach(d => d.classList.remove('show'));
+        }
+
+        // =====================
+        // ANIMATIONS
+        // =====================
+        // Animate KPI values on load
+        function animateValue(element, start, end, duration) {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                element.textContent = Math.floor(progress * (end - start) + start);
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        // Initialize on page load
+        window.addEventListener('load', function() {
+            // Dashboard ready
+        });
+    </script>
+</body>
+</html>
