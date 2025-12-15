@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pengaduan - Kemenkop</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 220px;
+            height: 100vh;
+            background: #fff;
+            padding: 20px 0;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            margin-bottom: 40px;
+        }
+
+        .logo img {
+            height: 40px;
+            width: auto;
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-item {
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            color: #888;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+            text-decoration: none;
+        }
+
+        .nav-item:hover {
+            background: #f8f8f8;
+        }
+
+        .nav-item.active {
+            color: #7CB342;
+            border-left-color: #7CB342;
+            background: #f0f7e6;
+        }
+
+        .nav-item svg {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+        }
+
+        .nav-item span {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .nav-settings {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 220px;
+            min-height: 100vh;
+            background: #f5f5f5;
+        }
+
+        /* Header */
+        .header {
+            background: #fff;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .notification-icon {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            color: #888;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: linear-gradient(135deg, #7CB342, #558B2F);
+        }
+
+        .user-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .user-dropdown {
+            color: #888;
+        }
+
+        /* Content Area */
+        .content-area {
+            padding: 30px;
+        }
+
+        /* Category Cards Grid */
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        .category-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            text-decoration: none;
+            min-height: 140px;
+        }
+
+        .category-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+        .card-content {
+            flex: 1;
+            padding-right: 15px;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+
+        .card-description {
+            font-size: 12px;
+            color: #888;
+            line-height: 1.5;
+        }
+
+        .card-icon {
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .card-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        /* Icon backgrounds */
+        .icon-circle {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .icon-simpan-pinjam {
+            background: linear-gradient(135deg, #E8EAF6 0%, #C5CAE9 100%);
+        }
+
+        .icon-kredit {
+            background: linear-gradient(135deg, #FFEBEE 0%, #FFCDD2 100%);
+        }
+
+        .icon-pelayanan {
+            background: linear-gradient(135deg, #FFF8E1 0%, #FFECB3 100%);
+        }
+
+        .icon-manajemen {
+            background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
+        }
+
+        .icon-aplikasi {
+            background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%);
+        }
+
+        .icon-administrasi {
+            background: linear-gradient(135deg, #FCE4EC 0%, #F8BBD9 100%);
+        }
+
+        .icon-transparansi {
+            background: linear-gradient(135deg, #E0F7FA 0%, #B2EBF2 100%);
+        }
+
+        .icon-sengketa {
+            background: linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%);
+        }
+
+        .icon-lainnya {
+            background: linear-gradient(135deg, #F5F5F5 0%, #EEEEEE 100%);
+        }
+
+        .card-icon svg {
+            width: 40px;
+            height: 40px;
+        }
+
+        /* Responsive */
+        @media (max-width: 1400px) {
+            .category-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 1100px) {
+            .category-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 70px;
+                padding: 15px 0;
+            }
+
+            .logo img {
+                height: 30px;
+            }
+
+            .nav-item span {
+                display: none;
+            }
+
+            .nav-item {
+                justify-content: center;
+                padding: 15px;
+            }
+
+            .nav-item svg {
+                margin-right: 0;
+            }
+
+            .main-content {
+                margin-left: 70px;
+            }
+
+            .category-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="logo">
+            <img src="logo_kop.png" alt="Kemenkop Logo">
+        </div>
+
+        <ul class="nav-menu">
+            <a href="#" class="nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                    <polyline points="9 22 9 12 15 12 15 22"/>
+                </svg>
+                <span>Beranda</span>
+            </a>
+            <a href="#" class="nav-item active">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                    <line x1="16" y1="13" x2="8" y2="13"/>
+                    <line x1="16" y1="17" x2="8" y2="17"/>
+                </svg>
+                <span>Pengaduan</span>
+            </a>
+            <a href="#" class="nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                    <polyline points="22 4 12 14.01 9 11.01"/>
+                </svg>
+                <span>Status Pengaduan</span>
+            </a>
+            <a href="#" class="nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                </svg>
+                <span>Riwayat Pengaduan</span>
+            </a>
+        </ul>
+
+        <div class="nav-settings">
+            <a href="#" class="nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="3"/>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                </svg>
+                <span>Pengaturan</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Header -->
+        <header class="header">
+            <h1 class="page-title">Pengaduan</h1>
+            <div class="header-right">
+                <svg class="notification-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                </svg>
+                <div class="user-profile">
+                    <div class="user-avatar"></div>
+                    <span class="user-name">Siti Karisma</span>
+                    <svg class="user-dropdown" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M6 9l6 6 6-6"/>
+                    </svg>
+                </div>
+            </div>
+        </header>
+
+        <!-- Content -->
+        <div class="content-area">
+            <div class="category-grid">
+                <!-- Simpan Pinjam -->
+                <a href="pengaduan-kdkmp.html" class="category-card">
+                    <div class="card-content">
+                        <h3 class="card-title">Simpan Pinjam</h3>
+                        <p class="card-description">Buat pengaduan terkait layanan simpan dan pinjam.</p>
+                    </div>
+                    <div class="card-icon">
+                        <div class="icon-circle icon-simpan-pinjam">
+                            <svg viewBox="0 0 64 64" fill="none">
+                                <circle cx="32" cy="24" r="12" fill="#7986CB"/>
+                                <path d="M20 44c0-6.627 5.373-12 12-12s12 5.373 12 12v4H20v-4z" fill="#5C6BC0"/>
+                                <circle cx="44" cy="20" r="8" fill="#FFD54F"/>
+                                <text x="44" y="24" text-anchor="middle" fill="#333" font-size="10" font-weight="bold">$</text>
+                            </svg>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Kredit Bermasalah -->
+                <a href="#" class="category-card">
+                    <div class="card-content">
+                        <h3 class="card-title">Kredit Bermasalah</h3>
+                        <p class="card-description">Ajukan laporan mengenai kendala atau masalah kredit dan pembiayaan.</p>
+                    </div>
+                    <div class="card-icon">
+                        <div class="icon-circle icon-kredit">
+                            <svg viewBox="0 0 64 64" fill="none">
+                                <rect x="12" y="18" width="40" height="28" rx="3" fill="#EF5350"/>
+                                <rect x="12" y="24" width="40" height="8" fill="#C62828"/>
+                                <rect x="18" y="36" width="16" height="4" rx="1" fill="#FFCDD2"/>
+                            </svg>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Pelayanan Koperasi -->
+                <a href="#" class="category-card">
+                    <div class="card-content">
+                        <h3 class="card-title">Pelayanan Koprasi</h3>
+                        <p class="card-description">Sampaikan pengaduan terkait kualitas dan respon pelayanan koperasi.</p>
+                    </div>
+                    <div class="card-icon">
+                        <div class="icon-circle icon-pelayanan">
+                            <svg viewBox="0 0 64 64" fill="none">
+                                <circle cx="32" cy="32" r="16" fill="#FFD54F"/>
+                                <circle cx="32" cy="32" r="10" fill="#FFF8E1"/>
+                                <path d="M28 30l3 3 6-6" stroke="#7CB342" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Manajemen / Kepengurusan -->
+                <a href="#" class="category-card">
+                    <div class="card-content">
+                        <h3 class="card-title">Manajemen / Kepengurusan</h3>
+                        <p class="card-description">Laporkan permasalahan yang berkaitan dengan pengurus atau tata kelola koperasi.</p>
+                    </div>
+                    <div class="card-icon">
+                        <div class="icon-circle icon-manajemen">
+                            <svg viewBox="0 0 64 64" fill="none">
+                                <rect x="16" y="12" width="32" height="40" rx="2" fill="#81C784"/>
+                                <rect x="20" y="18" width="24" height="3" fill="#E8F5E9"/>
+                                <rect x="20" y="24" width="18" height="2" fill="#E8F5E9"/>
+                                <rect x="20" y="29" width="20" height="2" fill="#E8F5E9"/>
+                                <circle cx="44" cy="44" r="10" fill="#FFD54F"/>
+                                <path d="M44 40v8M40 44h8" stroke="#333" stroke-width="2"/>
+                            </svg>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Aplikasi / Sistem Layanan -->
+                <a href="#" class="category-card">
+                    <div class="card-content">
+                        <h3 class="card-title">Aplikasi / Sistem Layanan</h3>
+                        <p class="card-description">Laporkan gangguan atau kendala pada aplikasi dan sistem layanan koperasi.</p>
+                    </div>
+                    <div class="card-icon">
+                        <div class="icon-circle icon-aplikasi">
+                            <svg viewBox="0 0 64 64" fill="none">
+                                <rect x="18" y="8" width="28" height="48" rx="4" fill="#64B5F6"/>
+                                <rect x="22" y="14" width="20" height="32" fill="#E3F2FD"/>
+                                <circle cx="32" cy="52" r="2" fill="#E3F2FD"/>
+                                <rect x="26" y="20" width="12" height="8" rx="1" fill="#42A5F5"/>
+                                <rect x="26" y="32" width="6" height="6" rx="1" fill="#90CAF9"/>
+                                <rect x="34" y="32" width="6" height="6" rx="1" fill="#90CAF9"/>
+                            </svg>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Administrasi & Keanggotaan -->
+                <a href="#" class="category-card">
+                    <div class="card-content">
+                        <h3 class="card-title">Administrasi & Keanggotaan</h3>
+                        <p class="card-description">Buat pengaduan terkait data anggota, dokumen, atau proses administrasi.</p>
+                    </div>
+                    <div class="card-icon">
+                        <div class="icon-circle icon-administrasi">
+                            <svg viewBox="0 0 64 64" fill="none">
+                                <rect x="14" y="14" width="28" height="36" rx="2" fill="#F48FB1"/>
+                                <rect x="18" y="20" width="20" height="2" fill="#FCE4EC"/>
+                                <rect x="18" y="26" width="16" height="2" fill="#FCE4EC"/>
+                                <rect x="18" y="32" width="18" height="2" fill="#FCE4EC"/>
+                                <rect x="22" y="18" width="24" height="32" rx="2" fill="#CE93D8" transform="translate(4, 4)"/>
+                                <rect x="30" y="28" width="16" height="2" fill="#F3E5F5"/>
+                                <rect x="30" y="34" width="12" height="2" fill="#F3E5F5"/>
+                            </svg>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Transparansi keuangan -->
+                <a href="#" class="category-card">
+                    <div class="card-content">
+                        <h3 class="card-title">Transparansi keuangan</h3>
+                        <p class="card-description">Ajukan laporan mengenai ketidaksesuaian atau ketidakjelasan laporan keuangan.</p>
+                    </div>
+                    <div class="card-icon">
+                        <div class="icon-circle icon-transparansi">
+                            <svg viewBox="0 0 64 64" fill="none">
+                                <rect x="12" y="20" width="40" height="28" rx="2" fill="#4DD0E1"/>
+                                <rect x="16" y="24" width="32" height="4" fill="#E0F7FA"/>
+                                <rect x="16" y="32" width="24" height="3" fill="#B2EBF2"/>
+                                <rect x="16" y="38" width="28" height="3" fill="#B2EBF2"/>
+                                <circle cx="48" cy="16" r="8" fill="#FFD54F"/>
+                                <text x="48" y="20" text-anchor="middle" fill="#333" font-size="8" font-weight="bold">%</text>
+                            </svg>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Sengketa / Perselisihan -->
+                <a href="#" class="category-card">
+                    <div class="card-content">
+                        <h3 class="card-title">Sengketa / Perselisihan</h3>
+                        <p class="card-description">Laporkan konflik atau perselisihan yang melibatkan anggota atau pengurus.</p>
+                    </div>
+                    <div class="card-icon">
+                        <div class="icon-circle icon-sengketa">
+                            <svg viewBox="0 0 64 64" fill="none">
+                                <circle cx="24" cy="24" r="10" fill="#64B5F6"/>
+                                <circle cx="24" cy="21" r="4" fill="#E3F2FD"/>
+                                <path d="M18 32c0-3.314 2.686-6 6-6s6 2.686 6 6" fill="#42A5F5"/>
+                                <circle cx="44" cy="28" r="10" fill="#FF8A65"/>
+                                <circle cx="44" cy="25" r="4" fill="#FBE9E7"/>
+                                <path d="M38 36c0-3.314 2.686-6 6-6s6 2.686 6 6" fill="#FF7043"/>
+                                <path d="M30 30l8 8M38 30l-8 8" stroke="#333" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Lainnya -->
+                <a href="#" class="category-card">
+                    <div class="card-content">
+                        <h3 class="card-title">Lainnya</h3>
+                        <p class="card-description">Buat pengaduan untuk kategori lain yang tidak tercantum di atas.</p>
+                    </div>
+                    <div class="card-icon">
+                        <div class="icon-circle icon-lainnya">
+                            <svg viewBox="0 0 64 64" fill="none">
+                                <circle cx="22" cy="32" r="4" fill="#9E9E9E"/>
+                                <circle cx="32" cy="32" r="4" fill="#9E9E9E"/>
+                                <circle cx="42" cy="32" r="4" fill="#9E9E9E"/>
+                            </svg>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

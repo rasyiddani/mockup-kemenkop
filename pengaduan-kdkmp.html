@@ -1,0 +1,1496 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Pengaduan KDKMP - Kemenkop</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 220px;
+            height: 100vh;
+            background: #fff;
+            padding: 20px 0;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            margin-bottom: 40px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+        }
+
+        .logo-icon svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .logo-text {
+            font-size: 18px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-item {
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            color: #888;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover {
+            background: #f8f8f8;
+        }
+
+        .nav-item.active {
+            color: #7CB342;
+            border-left-color: #7CB342;
+            background: #f0f7e6;
+        }
+
+        .nav-item svg {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+        }
+
+        .nav-item span {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .nav-settings {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 220px;
+            min-height: 100vh;
+            background: #f5f5f5;
+        }
+
+        /* Header */
+        .header {
+            background: #fff;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .page-title span {
+            font-weight: 400;
+            color: #888;
+            font-size: 14px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .notification-icon {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            color: #888;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: linear-gradient(135deg, #7CB342, #558B2F);
+        }
+
+        .user-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .user-dropdown {
+            color: #888;
+        }
+
+        /* Content Area */
+        .content-area {
+            padding: 30px;
+        }
+
+        /* Data Pelapor Card */
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 25px 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .pelapor-info {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .info-label {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            font-size: 14px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        /* Form Pengaduan */
+        .form-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .form-subtitle {
+            font-size: 13px;
+            color: #888;
+            margin-bottom: 25px;
+        }
+
+        .privacy-options {
+            display: flex;
+            gap: 20px;
+        }
+
+        .privacy-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .privacy-checkbox {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            border: 2px solid #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .privacy-checkbox.active {
+            background: #7CB342;
+            border-color: #7CB342;
+        }
+
+        .privacy-checkbox svg {
+            width: 12px;
+            height: 12px;
+            color: #fff;
+            display: none;
+        }
+
+        .privacy-checkbox.active svg {
+            display: block;
+        }
+
+        .privacy-label {
+            font-size: 13px;
+            color: #666;
+        }
+
+        /* Form Grid */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .form-left, .form-right {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Form Group */
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-label {
+            font-size: 13px;
+            color: #333;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-label .required {
+            color: #F44336;
+        }
+
+        .form-select, .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #333;
+            background: #fff;
+            transition: border-color 0.3s;
+            appearance: none;
+        }
+
+        .form-select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            cursor: pointer;
+        }
+
+        .form-select:focus, .form-input:focus {
+            outline: none;
+            border-color: #7CB342;
+        }
+
+        .form-input::placeholder {
+            color: #aaa;
+        }
+
+        .form-textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #333;
+            resize: vertical;
+            min-height: 120px;
+            font-family: inherit;
+        }
+
+        .form-textarea:focus {
+            outline: none;
+            border-color: #7CB342;
+        }
+
+        /* Dampak Checkboxes */
+        .dampak-group {
+            margin-bottom: 20px;
+        }
+
+        .dampak-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .dampak-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .dampak-checkbox {
+            width: 22px;
+            height: 22px;
+            border-radius: 4px;
+            border: 2px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            flex-shrink: 0;
+        }
+
+        .dampak-checkbox.active {
+            background: #7CB342;
+            border-color: #7CB342;
+        }
+
+        .dampak-checkbox svg {
+            width: 14px;
+            height: 14px;
+            color: #fff;
+            display: none;
+        }
+
+        .dampak-checkbox.active svg {
+            display: block;
+        }
+
+        .dampak-label {
+            font-size: 13px;
+            color: #555;
+        }
+
+        /* File Upload */
+        .file-upload-area {
+            border: 2px dashed #7CB342;
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #fafffe;
+        }
+
+        .file-upload-area:hover {
+            background: #f0f7e6;
+        }
+
+        .upload-icon {
+            width: 40px;
+            height: 40px;
+            color: #7CB342;
+            margin-bottom: 10px;
+        }
+
+        .upload-text {
+            font-size: 14px;
+            color: #7CB342;
+            font-weight: 500;
+        }
+
+        .upload-limit {
+            font-size: 12px;
+            color: #7CB342;
+            margin-top: 5px;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .uploaded-files {
+            margin-top: 15px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .uploaded-file {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: #f5f5f5;
+            border-radius: 6px;
+            font-size: 12px;
+        }
+
+        .remove-file {
+            cursor: pointer;
+            color: #F44336;
+        }
+
+        /* Pertanyaan Tertutup Section */
+        .pertanyaan-section {
+            margin-top: 25px;
+            padding-top: 25px;
+            border-top: 1px solid #eee;
+        }
+
+        .pertanyaan-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .pertanyaan-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .pertanyaan-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .pertanyaan-item:hover {
+            background: #f0f7e6;
+        }
+
+        .pertanyaan-item.selected {
+            background: #e8f5e9;
+            border: 1px solid #7CB342;
+        }
+
+        .pertanyaan-checkbox {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            border: 2px solid #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.3s;
+        }
+
+        .pertanyaan-item.selected .pertanyaan-checkbox {
+            background: #7CB342;
+            border-color: #7CB342;
+        }
+
+        .pertanyaan-checkbox svg {
+            width: 12px;
+            height: 12px;
+            color: #fff;
+            display: none;
+        }
+
+        .pertanyaan-item.selected .pertanyaan-checkbox svg {
+            display: block;
+        }
+
+        .pertanyaan-text {
+            font-size: 13px;
+            color: #555;
+            line-height: 1.5;
+        }
+
+        /* Keterangan Tambahan */
+        .keterangan-section {
+            margin-top: 20px;
+            display: none;
+        }
+
+        .keterangan-section.visible {
+            display: block;
+        }
+
+        .keterangan-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        /* Buttons */
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 14px 30px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            flex: 1;
+        }
+
+        .btn-cancel {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            color: #666;
+        }
+
+        .btn-cancel:hover {
+            background: #f5f5f5;
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, #7CB342, #558B2F);
+            color: #fff;
+        }
+
+        .btn-submit:hover {
+            background: linear-gradient(135deg, #689F38, #33691E);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(124, 179, 66, 0.4);
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 15px 25px;
+            background: #333;
+            color: #fff;
+            border-radius: 8px;
+            font-size: 14px;
+            display: none;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+
+        .toast.success {
+            background: #4CAF50;
+        }
+
+        .toast.error {
+            background: #F44336;
+        }
+
+        .toast.show {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Scrollbar */
+        .pertanyaan-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .pertanyaan-list::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+
+        .pertanyaan-list::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 3px;
+        }
+
+        .pertanyaan-list::-webkit-scrollbar-thumb:hover {
+            background: #aaa;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .pelapor-info {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 992px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 70px;
+                padding: 15px 0;
+            }
+
+            .logo-text, .nav-item span {
+                display: none;
+            }
+
+            .nav-item {
+                justify-content: center;
+                padding: 15px;
+            }
+
+            .nav-item svg {
+                margin-right: 0;
+            }
+
+            .main-content {
+                margin-left: 70px;
+            }
+
+            .pelapor-info {
+                grid-template-columns: 1fr;
+            }
+
+            .dampak-options {
+                grid-template-columns: 1fr;
+            }
+
+            .keterangan-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="logo">
+            <div class="logo-icon">
+                <svg viewBox="0 0 40 40" fill="none">
+                    <circle cx="20" cy="20" r="18" fill="#7CB342"/>
+                    <path d="M12 20C12 15.5817 15.5817 12 20 12C24.4183 12 28 15.5817 28 20" stroke="#FFD54F" stroke-width="4" stroke-linecap="round"/>
+                    <circle cx="20" cy="24" r="4" fill="#FFD54F"/>
+                </svg>
+            </div>
+            <span class="logo-text">Kemenkop</span>
+        </div>
+
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                    <polyline points="9 22 9 12 15 12 15 22"/>
+                </svg>
+                <span>Beranda</span>
+            </li>
+            <li class="nav-item active">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                    <line x1="16" y1="13" x2="8" y2="13"/>
+                    <line x1="16" y1="17" x2="8" y2="17"/>
+                </svg>
+                <span>Pengaduan</span>
+            </li>
+            <li class="nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                    <polyline points="22 4 12 14.01 9 11.01"/>
+                </svg>
+                <span>Status Pengaduan</span>
+            </li>
+            <li class="nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                </svg>
+                <span>Riwayat Pengaduan</span>
+            </li>
+        </ul>
+
+        <div class="nav-settings">
+            <li class="nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="3"/>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                </svg>
+                <span>Pengaturan</span>
+            </li>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Header -->
+        <header class="header">
+            <h1 class="page-title">Simpan Pinjam <span>/ Pengaduan</span></h1>
+            <div class="header-right">
+                <svg class="notification-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                </svg>
+                <div class="user-profile">
+                    <div class="user-avatar"></div>
+                    <span class="user-name">Siti Karisma</span>
+                    <svg class="user-dropdown" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M6 9l6 6 6-6"/>
+                    </svg>
+                </div>
+            </div>
+        </header>
+
+        <!-- Content -->
+        <div class="content-area">
+            <!-- Data Pelapor -->
+            <div class="card">
+                <h2 class="card-title">Data Pelapor</h2>
+                <div class="pelapor-info">
+                    <div class="info-item">
+                        <span class="info-label">Nama Pelapor:</span>
+                        <span class="info-value">Siti Karisma</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">NIK / Nomor Anggota:</span>
+                        <span class="info-value">0019918267484992019</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Email:</span>
+                        <span class="info-value">Sitikarisma123@gmail.com</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Alamat:</span>
+                        <span class="info-value">Jl. Bojong Soang, perumahan Podomoro, Blok F2, No.03</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Pengaduan -->
+            <div class="card">
+                <div class="form-header">
+                    <div>
+                        <h2 class="card-title">Pelaporan Simpan Pinjam</h2>
+                        <p class="form-subtitle">Isi data berikut untuk melaporkan keresahan mu</p>
+                    </div>
+                    <div class="privacy-options">
+                        <div class="privacy-option" data-type="rahasia">
+                            <div class="privacy-checkbox active">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                    <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                            </div>
+                            <span class="privacy-label">Rahasia</span>
+                        </div>
+                        <div class="privacy-option" data-type="anonim">
+                            <div class="privacy-checkbox">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                    <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                            </div>
+                            <span class="privacy-label">Anonim</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-left">
+                        <!-- Koperasi Tujuan -->
+                        <div class="form-group">
+                            <label class="form-label"><span class="required">*</span>Koperasi Tujuan</label>
+                            <select class="form-select" id="koperasiTujuan">
+                                <option value="">Pilih Koperasi</option>
+                                <option value="koperasi-bandung">Koperasi, Bandung Pusat</option>
+                                <option value="koperasi-jakarta">Koperasi, Jakarta Selatan</option>
+                                <option value="koperasi-surabaya">Koperasi, Surabaya Timur</option>
+                            </select>
+                        </div>
+
+                        <!-- Main Directory -->
+                        <div class="form-group">
+                            <label class="form-label"><span class="required">*</span>Kategori Utama (Main Directory)</label>
+                            <select class="form-select" id="mainDirectory">
+                                <option value="">Pilih Kategori Utama</option>
+                            </select>
+                        </div>
+
+                        <!-- Sub Directory -->
+                        <div class="form-group">
+                            <label class="form-label"><span class="required">*</span>Sub Kategori (Sub Directory)</label>
+                            <select class="form-select" id="subDirectory" disabled>
+                                <option value="">Pilih Sub Kategori</option>
+                            </select>
+                        </div>
+
+                        <!-- Klaster Pengaduan -->
+                        <div class="form-group">
+                            <label class="form-label"><span class="required">*</span>Klaster Pengaduan</label>
+                            <select class="form-select" id="klasterPengaduan" disabled>
+                                <option value="">Pilih Klaster Pengaduan</option>
+                            </select>
+                        </div>
+
+                        <!-- Nominal Terkait -->
+                        <div class="form-group">
+                            <label class="form-label"><span class="required">*</span>Nominal Terkait</label>
+                            <input type="text" class="form-input" id="nominalTerkait" placeholder="Rp.1.000.000">
+                        </div>
+
+                        <!-- Tanggal Kejadian -->
+                        <div class="form-group">
+                            <label class="form-label"><span class="required">*</span>Tanggal Kejadian</label>
+                            <input type="date" class="form-input" id="tanggalKejadian">
+                        </div>
+
+                        <!-- Deskripsi -->
+                        <div class="form-group">
+                            <label class="form-label"><span class="required">*</span>Deskripsi</label>
+                            <textarea class="form-textarea" id="deskripsi" placeholder="Jelaskan kronologi kejadian secara singkat..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-right">
+                        <!-- Dampak Yang Dialami -->
+                        <div class="dampak-group">
+                            <label class="form-label"><span class="required">*</span>Dampak Yang Dialami:</label>
+                            <div class="dampak-options">
+                                <div class="dampak-option" data-value="tidak-bisa-menarik">
+                                    <div class="dampak-checkbox active">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                            <polyline points="20 6 9 17 4 12"/>
+                                        </svg>
+                                    </div>
+                                    <span class="dampak-label">Tidak bisa menarik simpanan</span>
+                                </div>
+                                <div class="dampak-option" data-value="kerugian-finansial">
+                                    <div class="dampak-checkbox">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                            <polyline points="20 6 9 17 4 12"/>
+                                        </svg>
+                                    </div>
+                                    <span class="dampak-label">Kerugian finansial</span>
+                                </div>
+                                <div class="dampak-option" data-value="akun-diblokir">
+                                    <div class="dampak-checkbox">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                            <polyline points="20 6 9 17 4 12"/>
+                                        </svg>
+                                    </div>
+                                    <span class="dampak-label">Akun diblokir</span>
+                                </div>
+                                <div class="dampak-option" data-value="layanan-terhenti">
+                                    <div class="dampak-checkbox">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                            <polyline points="20 6 9 17 4 12"/>
+                                        </svg>
+                                    </div>
+                                    <span class="dampak-label">Layanan terhenti</span>
+                                </div>
+                                <div class="dampak-option" data-value="lainnya">
+                                    <div class="dampak-checkbox">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                            <polyline points="20 6 9 17 4 12"/>
+                                        </svg>
+                                    </div>
+                                    <span class="dampak-label">Lainnya</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pertanyaan Tertutup -->
+                        <div class="pertanyaan-section" id="pertanyaanSection">
+                            <h3 class="pertanyaan-title">Pilih Topik Pengaduan Spesifik:</h3>
+                            <div class="pertanyaan-list" id="pertanyaanList">
+                                <!-- Akan diisi oleh JavaScript -->
+                                <p style="color: #888; font-size: 13px;">Silakan pilih Klaster Pengaduan terlebih dahulu untuk melihat pertanyaan terkait.</p>
+                            </div>
+                        </div>
+
+                        <!-- Keterangan Tambahan -->
+                        <div class="keterangan-section" id="keteranganSection">
+                            <h3 class="pertanyaan-title">Keterangan Tambahan:</h3>
+                            <div class="keterangan-grid">
+                                <div class="form-group">
+                                    <label class="form-label">Berapa lama masalah ini terjadi?</label>
+                                    <select class="form-select" id="lamaKejadian">
+                                        <option value="">Pilih durasi</option>
+                                        <option value="< 1 minggu">Kurang dari 1 minggu</option>
+                                        <option value="1-4 minggu">1-4 minggu</option>
+                                        <option value="1-3 bulan">1-3 bulan</option>
+                                        <option value="3-6 bulan">3-6 bulan</option>
+                                        <option value="6-12 bulan">6-12 bulan</option>
+                                        <option value="> 1 tahun">Lebih dari 1 tahun</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Sudah ada komunikasi awal dengan terlapor?</label>
+                                    <select class="form-select" id="komunikasiAwal">
+                                        <option value="">Pilih opsi</option>
+                                        <option value="belum">Belum pernah</option>
+                                        <option value="sudah-tidak-respon">Sudah, tapi tidak ada respon</option>
+                                        <option value="sudah-tidak-selesai">Sudah, tapi belum terselesaikan</option>
+                                        <option value="sudah-ditolak">Sudah, tapi ditolak</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Keterangan tambahan lainnya (opsional)</label>
+                                <textarea class="form-textarea" id="keteranganLain" placeholder="Tuliskan keterangan tambahan jika ada..." style="min-height: 80px;"></textarea>
+                            </div>
+                        </div>
+
+                        <!-- File Upload -->
+                        <div class="form-group">
+                            <label class="form-label"><span class="required">*</span>Lampiran Bukti:</label>
+                            <div class="file-upload-area" id="fileUploadArea">
+                                <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="12" y1="5" x2="12" y2="19"/>
+                                    <line x1="5" y1="12" x2="19" y2="12"/>
+                                </svg>
+                                <p class="upload-text">Add File</p>
+                                <p class="upload-limit">Max 5 File</p>
+                                <input type="file" class="file-input" id="fileInput" multiple accept="image/*,.pdf,.doc,.docx">
+                            </div>
+                            <div class="uploaded-files" id="uploadedFiles"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Buttons -->
+                <div class="button-group">
+                    <button class="btn btn-cancel" id="btnBatal">Batal</button>
+                    <button class="btn btn-submit" id="btnSubmit">Ajukan Pengaduan</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // Data Struktur Pengaduan KDKMP
+        const dataKDKMP = {
+            "1": {
+                nama: "Kelayakan dan Kepatutan (Pengurus dan Pengawas)",
+                subDirectory: {
+                    "integritas": {
+                        nama: "Integritas dan Kompetensi",
+                        klaster: {
+                            "aspek-hukum": {
+                                nama: "Aspek Perbuatan Hukum",
+                                pertanyaan: [
+                                    "Ketidakcakapan dalam melakukan perbuatan hukum"
+                                ]
+                            },
+                            "akhlak-moral": {
+                                nama: "Tidak memperlihatkan akhlak dan moral yang baik",
+                                pertanyaan: [
+                                    "Menjalani hukuman pidana berkekuatan hukum tetap",
+                                    "Pernah dihukum atas tindak pidana yang merugikan korporasi/keuangan negara/berkaitan sektor keuangan (5 tahun sebelum pencalonan)",
+                                    "Tidak memperlihatkan komitmen untuk mematuhi peraturan perundangan dan mendukung kebijakan Kementerian Koperasi",
+                                    "Tidak memiliki komitmen terhadap pengembangan koperasi yang sehat"
+                                ]
+                            },
+                            "reputasi-keuangan": {
+                                nama: "Reputasi keuangan yang tidak mencukupi",
+                                pertanyaan: [
+                                    "Memiliki kredit/pembiayaan macet (dalam SLIK OJK)",
+                                    "Pernah dinyatakan pailit (secara pribadi/korporasi) atau menjadi penyebab korporasi dinyatakan pailit (5 tahun terakhir sebelum pencalonan)",
+                                    "Tidak menunjukkan komitmen untuk melakukan upaya yang diperlukan jika koperasi menghadapi masalah keuangan"
+                                ]
+                            },
+                            "kompetensi": {
+                                nama: "Tingkat kompetensi yang belum memadai",
+                                pertanyaan: [
+                                    "Tidak memiliki pengetahuan tentang nilai/prinsip/identitas koperasi",
+                                    "Tidak memiliki kecukupan kemampuan dalam mengelola konflik",
+                                    "Tidak cukup memahami dan mengimplementasikan proses bisnis koperasi/menyusun rencana strategis/mengevaluasi rencana kerja",
+                                    "Tidak memiliki cukup kemampuan dalam mengelola keuangan koperasi (termasuk simpanan, modal, dan pendapatan)",
+                                    "Tidak memiliki kecukupan kemampuan dalam manajemen risiko koperasi"
+                                ]
+                            }
+                        }
+                    }
+                }
+            },
+            "2": {
+                nama: "Kelembagaan Koperasi",
+                subDirectory: {
+                    "legalitas": {
+                        nama: "Legalitas",
+                        klaster: {
+                            "legalitas-badan-hukum": {
+                                nama: "Legalitas Badan Hukum",
+                                pertanyaan: [
+                                    "Tidak terdapat akte pendirian notaris",
+                                    "Tidak terdapat SK Pengesahan Badan Hukum",
+                                    "Tidak terdapat Sertifikat Nomor Induk Koperasi (NIK)"
+                                ]
+                            },
+                            "legalitas-usaha": {
+                                nama: "Legalitas Usaha",
+                                pertanyaan: [
+                                    "Tidak terdapat izin usaha yang lengkap dengan jenis izin dan pihak yang memberikan izin"
+                                ]
+                            }
+                        }
+                    },
+                    "alat-kelengkapan": {
+                        nama: "Alat Kelengkapan",
+                        klaster: {
+                            "struktur-organisasi": {
+                                nama: "Struktur Organisasi",
+                                pertanyaan: [
+                                    "Tidak terdapat struktur organisasi tertulis",
+                                    "Tidak terdapat uraian tugas tiap bagian organisasi"
+                                ]
+                            }
+                        }
+                    },
+                    "sop": {
+                        nama: "Standar Operasional Prosedur (SOP)",
+                        klaster: {
+                            "sop-kelembagaan": {
+                                nama: "SOP Kelembagaan",
+                                pertanyaan: [
+                                    "Tidak terdapat SOP pemilihan pengurus",
+                                    "Tidak terdapat SOP pemilihan pengawas",
+                                    "Tidak terdapat SOP pelaksanaan Rapat Anggota Tahunan (RAT)",
+                                    "Tidak terdapat SOP penetapan kesimpulan hasil RAT",
+                                    "Tidak terdapat SOP penetapan kebijakan investasi",
+                                    "Tidak terdapat SOP penetapan pengangkatan karyawan"
+                                ]
+                            },
+                            "sop-usaha": {
+                                nama: "SOP Usaha",
+                                pertanyaan: [
+                                    "Tidak terdapat SOP strategi pemasaran dana",
+                                    "Tidak terdapat SOP promosi penyaluran pinjaman",
+                                    "Tidak terdapat SOP permohonan pinjaman",
+                                    "Tidak terdapat SOP evaluasi proposal",
+                                    "Tidak terdapat SOP survei lapangan",
+                                    "Tidak terdapat SOP penetapan pinjaman",
+                                    "Tidak terdapat SOP pencairan dana",
+                                    "Tidak terdapat SOP monev angsuran pinjaman"
+                                ]
+                            },
+                            "sop-keuangan": {
+                                nama: "SOP Keuangan",
+                                pertanyaan: [
+                                    "Tidak terdapat SOP pembukuan keuangan dan non-keuangan",
+                                    "Tidak terdapat SOP pengeluaran dana",
+                                    "Tidak terdapat SOP penerimaan dana",
+                                    "Tidak terdapat SOP batasan pengeluaran dana",
+                                    "Tidak terdapat SOP pengendalian kas",
+                                    "Tidak terdapat SOP pengendalian pinjaman (piutang)",
+                                    "Tidak terdapat SOP pengendalian aset tetap",
+                                    "Tidak terdapat SOP hutang",
+                                    "Tidak terdapat SOP penerimaan simpanan anggota"
+                                ]
+                            }
+                        }
+                    }
+                }
+            },
+            "3": {
+                nama: "Kebermanfaatan Koperasi",
+                subDirectory: {
+                    "manfaat-anggota": {
+                        nama: "Manfaat bagi Anggota",
+                        klaster: {
+                            "administrasi-kompetisi": {
+                                nama: "Aspek Administrasi dan Kompetisi",
+                                pertanyaan: [
+                                    "Tidak terdapat pelaporan tertulis dan aspek formal administrasi pembagian SHU",
+                                    "Harga barang belum kompetitif dibandingkan dengan pengusaha lain",
+                                    "Tidak terdapat pengumuman tertulis dan/atau publikasi laporan keuangan",
+                                    "Tidak terdapat pengumuman tertulis dan/atau publikasi perubahan tingkat suku bunga"
+                                ]
+                            },
+                            "layanan-anggota": {
+                                nama: "Layanan kepada anggota",
+                                pertanyaan: [
+                                    "Koperasi belum pernah memberikan bantuan aspek sosial pada anggota",
+                                    "Koperasi belum pernah memberikan bantuan aspek kesehatan pada anggota",
+                                    "Koperasi belum pernah memberikan bantuan aspek pendidikan pada anggota",
+                                    "Koperasi belum pernah memberikan bantuan aspek keagamaan pada anggota",
+                                    "Koperasi belum pernah memberikan bantuan aspek keolahragaan dan kepemudaan pada anggota"
+                                ]
+                            }
+                        }
+                    },
+                    "manfaat-masyarakat": {
+                        nama: "Manfaat bagi masyarakat sekitar",
+                        klaster: {
+                            "ketenagakerjaan": {
+                                nama: "Aspek Ketenagakerjaan",
+                                pertanyaan: [
+                                    "Masih rendahnya penyerapan tenaga kerja meskipun pendapatan dan lingkup bisnis koperasi meningkat",
+                                    "Terjadi pemutusan hubungan kerja secara sepihak",
+                                    "Tenaga profesional dikontrak tanpa persetujuan RAT",
+                                    "Kesenjangan dalam memperoleh akses pelatihan antar anggota dan karyawan"
+                                ]
+                            },
+                            "aksesibilitas": {
+                                nama: "Aksesibilitas layanan koperasi",
+                                pertanyaan: [
+                                    "Tidak terdapat gerai sembako",
+                                    "Tidak terdapat apotek desa",
+                                    "Tidak terdapat gerai kantor koperasi",
+                                    "Tidak terdapat gerai unit usaha simpan pinjam",
+                                    "Tidak terdapat gerai klinik desa",
+                                    "Tidak terdapat gerai cold storage",
+                                    "Tidak terdapat aspek logistik - distribusi"
+                                ]
+                            }
+                        }
+                    }
+                }
+            },
+            "4": {
+                nama: "Kemitraan & Akselerasi Jaringan Usaha",
+                subDirectory: {
+                    "kemitraan": {
+                        nama: "Permasalahan dalam Kemitraan",
+                        klaster: {
+                            "kendala-mitra": {
+                                nama: "Kendala dalam aktivitas koperasi dengan mitra",
+                                pertanyaan: [
+                                    "Wanprestasi koperasi",
+                                    "Sengketa bagi hasil",
+                                    "Sengketa Hak Kekayaan Intelektual",
+                                    "Ketidakmampuan koperasi dalam mengembalikan fasilitas",
+                                    "Komunikasi bisnis koperasi tidak berjalan dengan efektif",
+                                    "Masalah hubungan kemitraan lainnya"
+                                ]
+                            }
+                        }
+                    }
+                }
+            },
+            "5": {
+                nama: "Digitalisasi Sistem",
+                subDirectory: {
+                    "sistem-komputasi": {
+                        nama: "Permasalahan dalam Sistem Komputasi & Data Pribadi",
+                        klaster: {
+                            "input-integrasi": {
+                                nama: "Proses Input Data & Integrasi Data",
+                                pertanyaan: [
+                                    "Kesalahan integrasi NIK pengurus, pengawas, anggota dan karyawan koperasi",
+                                    "Kegagalan input data",
+                                    "Gangguan layanan basis data",
+                                    "Keterbatasan akses internet",
+                                    "Permasalahan kompetensi operator sistem",
+                                    "Penonaktifan/penghapusan anggota tanpa persetujuan"
+                                ]
+                            },
+                            "perlindungan-data": {
+                                nama: "Perlindungan Data Pribadi",
+                                pertanyaan: [
+                                    "Kebocoran data pengurus, pengawas, anggota dan karyawan",
+                                    "Penyalahgunaan data pengurus, pengawas, anggota dan karyawan"
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+        };
+
+        // DOM Elements
+        const mainDirectory = document.getElementById('mainDirectory');
+        const subDirectory = document.getElementById('subDirectory');
+        const klasterPengaduan = document.getElementById('klasterPengaduan');
+        const pertanyaanList = document.getElementById('pertanyaanList');
+        const keteranganSection = document.getElementById('keteranganSection');
+        const fileUploadArea = document.getElementById('fileUploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const uploadedFiles = document.getElementById('uploadedFiles');
+        const toast = document.getElementById('toast');
+
+        let selectedPertanyaan = [];
+        let uploadedFilesList = [];
+
+        // Initialize Main Directory
+        function initMainDirectory() {
+            mainDirectory.innerHTML = '<option value="">Pilih Kategori Utama</option>';
+            for (const [key, value] of Object.entries(dataKDKMP)) {
+                const option = document.createElement('option');
+                option.value = key;
+                option.textContent = `${key}. ${value.nama}`;
+                mainDirectory.appendChild(option);
+            }
+        }
+
+        // Update Sub Directory
+        function updateSubDirectory() {
+            const mainKey = mainDirectory.value;
+            subDirectory.innerHTML = '<option value="">Pilih Sub Kategori</option>';
+            klasterPengaduan.innerHTML = '<option value="">Pilih Klaster Pengaduan</option>';
+            pertanyaanList.innerHTML = '<p style="color: #888; font-size: 13px;">Silakan pilih Klaster Pengaduan terlebih dahulu.</p>';
+            keteranganSection.classList.remove('visible');
+            
+            if (mainKey && dataKDKMP[mainKey]) {
+                subDirectory.disabled = false;
+                for (const [key, value] of Object.entries(dataKDKMP[mainKey].subDirectory)) {
+                    const option = document.createElement('option');
+                    option.value = key;
+                    option.textContent = value.nama;
+                    subDirectory.appendChild(option);
+                }
+            } else {
+                subDirectory.disabled = true;
+                klasterPengaduan.disabled = true;
+            }
+        }
+
+        // Update Klaster Pengaduan
+        function updateKlasterPengaduan() {
+            const mainKey = mainDirectory.value;
+            const subKey = subDirectory.value;
+            klasterPengaduan.innerHTML = '<option value="">Pilih Klaster Pengaduan</option>';
+            pertanyaanList.innerHTML = '<p style="color: #888; font-size: 13px;">Silakan pilih Klaster Pengaduan terlebih dahulu.</p>';
+            keteranganSection.classList.remove('visible');
+            
+            if (mainKey && subKey && dataKDKMP[mainKey]?.subDirectory[subKey]) {
+                klasterPengaduan.disabled = false;
+                for (const [key, value] of Object.entries(dataKDKMP[mainKey].subDirectory[subKey].klaster)) {
+                    const option = document.createElement('option');
+                    option.value = key;
+                    option.textContent = value.nama;
+                    klasterPengaduan.appendChild(option);
+                }
+            } else {
+                klasterPengaduan.disabled = true;
+            }
+        }
+
+        // Update Pertanyaan Tertutup
+        function updatePertanyaan() {
+            const mainKey = mainDirectory.value;
+            const subKey = subDirectory.value;
+            const klasterKey = klasterPengaduan.value;
+            selectedPertanyaan = [];
+            
+            if (mainKey && subKey && klasterKey && 
+                dataKDKMP[mainKey]?.subDirectory[subKey]?.klaster[klasterKey]) {
+                const pertanyaanData = dataKDKMP[mainKey].subDirectory[subKey].klaster[klasterKey].pertanyaan;
+                
+                pertanyaanList.innerHTML = '';
+                pertanyaanData.forEach((p, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'pertanyaan-item';
+                    item.dataset.index = index;
+                    item.innerHTML = `
+                        <div class="pertanyaan-checkbox">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                        </div>
+                        <span class="pertanyaan-text">${p}</span>
+                    `;
+                    item.addEventListener('click', () => togglePertanyaan(item, p));
+                    pertanyaanList.appendChild(item);
+                });
+            } else {
+                pertanyaanList.innerHTML = '<p style="color: #888; font-size: 13px;">Silakan pilih Klaster Pengaduan terlebih dahulu.</p>';
+                keteranganSection.classList.remove('visible');
+            }
+        }
+
+        // Toggle Pertanyaan Selection
+        function togglePertanyaan(element, pertanyaan) {
+            element.classList.toggle('selected');
+            
+            if (element.classList.contains('selected')) {
+                selectedPertanyaan.push(pertanyaan);
+            } else {
+                selectedPertanyaan = selectedPertanyaan.filter(p => p !== pertanyaan);
+            }
+            
+            // Show keterangan section if any pertanyaan selected
+            if (selectedPertanyaan.length > 0) {
+                keteranganSection.classList.add('visible');
+            } else {
+                keteranganSection.classList.remove('visible');
+            }
+        }
+
+        // Privacy Options
+        document.querySelectorAll('.privacy-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.privacy-checkbox').forEach(cb => cb.classList.remove('active'));
+                this.querySelector('.privacy-checkbox').classList.add('active');
+            });
+        });
+
+        // Dampak Options
+        document.querySelectorAll('.dampak-option').forEach(option => {
+            option.addEventListener('click', function() {
+                this.querySelector('.dampak-checkbox').classList.toggle('active');
+            });
+        });
+
+        // File Upload
+        fileUploadArea.addEventListener('click', () => fileInput.click());
+        
+        fileUploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            fileUploadArea.style.background = '#e8f5e9';
+        });
+        
+        fileUploadArea.addEventListener('dragleave', () => {
+            fileUploadArea.style.background = '#fafffe';
+        });
+        
+        fileUploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            fileUploadArea.style.background = '#fafffe';
+            handleFiles(e.dataTransfer.files);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            handleFiles(e.target.files);
+        });
+
+        function handleFiles(files) {
+            const maxFiles = 5;
+            const currentCount = uploadedFilesList.length;
+            
+            if (currentCount + files.length > maxFiles) {
+                showToast('Maksimal 5 file yang dapat diunggah', 'error');
+                return;
+            }
+            
+            Array.from(files).forEach(file => {
+                if (uploadedFilesList.length < maxFiles) {
+                    uploadedFilesList.push(file);
+                    displayUploadedFile(file);
+                }
+            });
+        }
+
+        function displayUploadedFile(file) {
+            const fileElement = document.createElement('div');
+            fileElement.className = 'uploaded-file';
+            fileElement.innerHTML = `
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                </svg>
+                <span>${file.name}</span>
+                <span class="remove-file" onclick="removeFile('${file.name}', this)">✕</span>
+            `;
+            uploadedFiles.appendChild(fileElement);
+        }
+
+        function removeFile(fileName, element) {
+            uploadedFilesList = uploadedFilesList.filter(f => f.name !== fileName);
+            element.parentElement.remove();
+        }
+
+        // Toast Notification
+        function showToast(message, type = 'success') {
+            toast.textContent = message;
+            toast.className = `toast ${type} show`;
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Form Submission
+        document.getElementById('btnSubmit').addEventListener('click', function() {
+            // Validate required fields
+            const koperasi = document.getElementById('koperasiTujuan').value;
+            const main = mainDirectory.value;
+            const sub = subDirectory.value;
+            const klaster = klasterPengaduan.value;
+            const nominal = document.getElementById('nominalTerkait').value;
+            const tanggal = document.getElementById('tanggalKejadian').value;
+            const deskripsi = document.getElementById('deskripsi').value;
+            
+            if (!koperasi || !main || !sub || !klaster || !nominal || !tanggal || !deskripsi) {
+                showToast('Mohon lengkapi semua field yang wajib diisi', 'error');
+                return;
+            }
+            
+            if (selectedPertanyaan.length === 0) {
+                showToast('Mohon pilih minimal satu topik pengaduan spesifik', 'error');
+                return;
+            }
+            
+            if (uploadedFilesList.length === 0) {
+                showToast('Mohon lampirkan bukti pendukung', 'error');
+                return;
+            }
+            
+            // Collect form data
+            const formData = {
+                koperasiTujuan: koperasi,
+                mainDirectory: dataKDKMP[main].nama,
+                subDirectory: dataKDKMP[main].subDirectory[sub].nama,
+                klasterPengaduan: dataKDKMP[main].subDirectory[sub].klaster[klaster].nama,
+                pertanyaanTertutup: selectedPertanyaan,
+                nominalTerkait: nominal,
+                tanggalKejadian: tanggal,
+                deskripsi: deskripsi,
+                dampak: Array.from(document.querySelectorAll('.dampak-checkbox.active'))
+                    .map(cb => cb.parentElement.querySelector('.dampak-label').textContent),
+                lamaKejadian: document.getElementById('lamaKejadian').value,
+                komunikasiAwal: document.getElementById('komunikasiAwal').value,
+                keteranganLain: document.getElementById('keteranganLain').value,
+                lampiran: uploadedFilesList.map(f => f.name)
+            };
+            
+            console.log('Form Data:', formData);
+            showToast('Pengaduan berhasil diajukan!', 'success');
+        });
+
+        // Cancel Button
+        document.getElementById('btnBatal').addEventListener('click', function() {
+            if (confirm('Apakah Anda yakin ingin membatalkan pengaduan ini?')) {
+                location.reload();
+            }
+        });
+
+        // Event Listeners
+        mainDirectory.addEventListener('change', updateSubDirectory);
+        subDirectory.addEventListener('change', updateKlasterPengaduan);
+        klasterPengaduan.addEventListener('change', updatePertanyaan);
+
+        // Initialize
+        initMainDirectory();
+    </script>
+</body>
+</html>
