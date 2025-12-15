@@ -1,0 +1,1927 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manajemen Pengaduan - Admin Kemenkop</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 220px;
+            height: 100vh;
+            background: #fff;
+            padding: 20px 0;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            margin-bottom: 40px;
+        }
+
+        .logo img {
+            height: 40px;
+            width: auto;
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-item {
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            color: #888;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+            text-decoration: none;
+        }
+
+        .nav-item:hover {
+            background: #f8f8f8;
+        }
+
+        .nav-item.active {
+            color: #7CB342;
+            border-left-color: #7CB342;
+            background: #f0f7e6;
+        }
+
+        .nav-item svg {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+        }
+
+        .nav-item span {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .nav-settings {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 220px;
+            min-height: 100vh;
+            background: #f5f5f5;
+        }
+
+        /* Header */
+        .header {
+            background: #fff;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .notification-icon {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            color: #888;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: linear-gradient(135deg, #FF9800, #F57C00);
+        }
+
+        .user-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .user-dropdown {
+            color: #888;
+        }
+
+        /* Content Area */
+        .content-area {
+            padding: 20px 30px;
+        }
+
+        /* Tabs */
+        .tabs-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #888;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab:hover {
+            color: #333;
+        }
+
+        .tab.active {
+            color: #7CB342;
+            border-bottom-color: #7CB342;
+        }
+
+        /* Filters */
+        .filters {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 8px 15px;
+            min-width: 200px;
+        }
+
+        .search-box input {
+            border: none;
+            outline: none;
+            font-size: 13px;
+            width: 100%;
+            margin-left: 10px;
+        }
+
+        .search-box svg {
+            width: 18px;
+            height: 18px;
+            color: #888;
+        }
+
+        .filter-select {
+            padding: 10px 35px 10px 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 13px;
+            background: #fff;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+        }
+
+        .date-filter {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background: #fff;
+            cursor: pointer;
+        }
+
+        .date-filter input {
+            border: none;
+            outline: none;
+            font-size: 13px;
+            width: 100px;
+            cursor: pointer;
+        }
+
+        .btn-print {
+            padding: 10px 25px;
+            background: linear-gradient(135deg, #7CB342, #558B2F);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+
+        .btn-print:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(124, 179, 66, 0.4);
+        }
+
+        /* Table */
+        .table-container {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            background: #fff;
+            padding: 15px;
+            text-align: left;
+            font-size: 13px;
+            font-weight: 600;
+            color: #333;
+            border-bottom: 1px solid #eee;
+        }
+
+        .data-table td {
+            padding: 15px;
+            font-size: 13px;
+            color: #555;
+            border-bottom: 1px solid #f5f5f5;
+        }
+
+        .data-table tr:hover {
+            background: #fafafa;
+        }
+
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Status Badge */
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        .status-verifikasi {
+            background: #FFF8E1;
+            color: #F9A825;
+        }
+
+        .status-dalam-proses {
+            background: #E3F2FD;
+            color: #1976D2;
+        }
+
+        .status-mediasi {
+            background: #F3E5F5;
+            color: #7B1FA2;
+        }
+
+        .status-mekanisme-lain {
+            background: #E0F2F1;
+            color: #00796B;
+        }
+
+        .status-ditolak {
+            background: #FFEBEE;
+            color: #C62828;
+        }
+
+        .status-selesai {
+            background: #E8F5E9;
+            color: #2E7D32;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .btn-go {
+            padding: 6px 20px;
+            background: #fff;
+            border: 1px solid #7CB342;
+            color: #7CB342;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-go:hover {
+            background: #7CB342;
+            color: #fff;
+        }
+
+        .btn-download {
+            padding: 6px 10px;
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-download:hover {
+            background: #f5f5f5;
+        }
+
+        .btn-download svg {
+            width: 16px;
+            height: 16px;
+            color: #888;
+        }
+
+        /* Pagination */
+        .pagination-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .pagination-info {
+            font-size: 13px;
+            color: #888;
+        }
+
+        .pagination {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .pagination-btn {
+            padding: 6px 12px;
+            border: none;
+            background: none;
+            font-size: 13px;
+            color: #888;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .pagination-btn:hover {
+            background: #f5f5f5;
+        }
+
+        .pagination-btn.active {
+            background: #7CB342;
+            color: #fff;
+        }
+
+        .rows-per-page {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .rows-per-page span {
+            font-size: 13px;
+            color: #888;
+        }
+
+        .rows-per-page select {
+            padding: 5px 10px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+        /* Modal Overlay */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        /* Modal */
+        .modal {
+            background: #fff;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 900px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 25px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .modal-close {
+            width: 30px;
+            height: 30px;
+            border: none;
+            background: none;
+            font-size: 24px;
+            color: #888;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+
+        .modal-close:hover {
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .modal-body {
+            padding: 25px;
+        }
+
+        /* Detail Grid */
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .detail-grid-3 {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .detail-label {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 5px;
+        }
+
+        .detail-value {
+            font-size: 14px;
+            color: #333;
+            padding: 10px;
+            background: #f9f9f9;
+            border-radius: 6px;
+        }
+
+        .detail-value-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-lihat-semua {
+            padding: 6px 12px;
+            background: #7CB342;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            font-size: 11px;
+            cursor: pointer;
+        }
+
+        /* Deskripsi Box */
+        .deskripsi-box {
+            margin-bottom: 20px;
+        }
+
+        .deskripsi-content {
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            font-size: 13px;
+            line-height: 1.6;
+            color: #555;
+            border-left: 3px solid #7CB342;
+        }
+
+        /* Section Title */
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 12px;
+        }
+
+        /* Pertanyaan Tertutup Section */
+        .pertanyaan-box {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f0f7e6;
+            border-radius: 8px;
+        }
+
+        .pertanyaan-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .pertanyaan-item:last-child {
+            border-bottom: none;
+        }
+
+        .pertanyaan-check {
+            width: 18px;
+            height: 18px;
+            background: #7CB342;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .pertanyaan-check svg {
+            width: 12px;
+            height: 12px;
+            color: #fff;
+        }
+
+        .pertanyaan-text {
+            font-size: 13px;
+            color: #555;
+        }
+
+        /* Keterangan Tambahan */
+        .keterangan-box {
+            margin-bottom: 20px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        /* Dampak Section */
+        .dampak-box {
+            margin-bottom: 20px;
+        }
+
+        .dampak-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .dampak-tag {
+            padding: 6px 12px;
+            background: #FFEBEE;
+            color: #C62828;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+
+        /* Action Select */
+        .action-section {
+            margin-bottom: 20px;
+        }
+
+        .action-select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            cursor: pointer;
+        }
+
+        .action-select:focus {
+            outline: none;
+            border-color: #7CB342;
+        }
+
+        /* Dynamic Form Sections */
+        .dynamic-section {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 8px;
+        }
+
+        .dynamic-section.show {
+            display: block;
+        }
+
+        .form-textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 13px;
+            resize: vertical;
+            min-height: 100px;
+            font-family: inherit;
+        }
+
+        .form-textarea:focus {
+            outline: none;
+            border-color: #7CB342;
+        }
+
+        /* File Upload */
+        .file-upload-area {
+            border: 2px dashed #7CB342;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #fafffe;
+            margin-top: 15px;
+        }
+
+        .file-upload-area:hover {
+            background: #f0f7e6;
+        }
+
+        .upload-icon {
+            width: 40px;
+            height: 40px;
+            color: #7CB342;
+            margin-bottom: 10px;
+        }
+
+        .upload-text {
+            font-size: 14px;
+            color: #7CB342;
+            font-weight: 500;
+        }
+
+        .upload-limit {
+            font-size: 12px;
+            color: #7CB342;
+            margin-top: 5px;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .uploaded-files {
+            margin-top: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .uploaded-file {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            background: #e8f5e9;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .remove-file {
+            cursor: pointer;
+            color: #C62828;
+        }
+
+        /* Log Admin */
+        .log-section {
+            margin-top: 20px;
+        }
+
+        .log-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .log-table th {
+            background: #f5f5f5;
+            padding: 10px 12px;
+            text-align: left;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .log-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #eee;
+            color: #666;
+        }
+
+        /* Modal Footer */
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            padding: 20px 25px;
+            border-top: 1px solid #eee;
+        }
+
+        .btn-undo {
+            padding: 12px 30px;
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-undo:hover {
+            background: #f5f5f5;
+        }
+
+        .btn-simpan {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #7CB342, #558B2F);
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #fff;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-simpan:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(124, 179, 66, 0.4);
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 15px 25px;
+            background: #333;
+            color: #fff;
+            border-radius: 8px;
+            font-size: 14px;
+            display: none;
+            z-index: 2000;
+        }
+
+        .toast.success {
+            background: #4CAF50;
+        }
+
+        .toast.error {
+            background: #F44336;
+        }
+
+        .toast.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Scrollbar */
+        .modal::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .modal::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .modal::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 4px;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .detail-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 70px;
+            }
+
+            .logo img, .nav-item span {
+                display: none;
+            }
+
+            .nav-item {
+                justify-content: center;
+            }
+
+            .nav-item svg {
+                margin-right: 0;
+            }
+
+            .main-content {
+                margin-left: 70px;
+            }
+
+            .tabs-container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .tabs {
+                overflow-x: auto;
+                width: 100%;
+            }
+
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .keterangan-box {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="logo">
+            <img src="logo_kop.png" alt="Kemenkop Logo">
+        </div>
+
+        <ul class="nav-menu">
+            <a href="#" class="nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                    <polyline points="9 22 9 12 15 12 15 22"/>
+                </svg>
+                <span>Beranda</span>
+            </a>
+            <a href="#" class="nav-item active">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                    <line x1="16" y1="13" x2="8" y2="13"/>
+                    <line x1="16" y1="17" x2="8" y2="17"/>
+                </svg>
+                <span>Pengaduan</span>
+            </a>
+            <a href="#" class="nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                    <polyline points="22 4 12 14.01 9 11.01"/>
+                </svg>
+                <span>Status Pengaduan</span>
+            </a>
+            <a href="#" class="nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                </svg>
+                <span>Riwayat Pengaduan</span>
+            </a>
+        </ul>
+
+        <div class="nav-settings">
+            <a href="#" class="nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="3"/>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                </svg>
+                <span>Pengaturan</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Header -->
+        <header class="header">
+            <h1 class="page-title">Manajemen Pengaduan</h1>
+            <div class="header-right">
+                <svg class="notification-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                </svg>
+                <div class="user-profile">
+                    <div class="user-avatar"></div>
+                    <span class="user-name">Admin 1</span>
+                    <svg class="user-dropdown" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M6 9l6 6 6-6"/>
+                    </svg>
+                </div>
+            </div>
+        </header>
+
+        <!-- Content Area -->
+        <div class="content-area">
+            <!-- Tabs and Filters -->
+            <div class="tabs-container">
+                <div class="tabs">
+                    <div class="tab" data-filter="semua">Semua</div>
+                    <!-- <div class="tab" data-filter="baru">Baru</div> -->
+                    <div class="tab active" data-filter="verifikasi">Butuh Verifikasi</div>
+                    <div class="tab" data-filter="dalam-proses">Dalam Proses</div>
+                    <div class="tab" data-filter="proses-mediasi">Proses Mediasi</div>
+                    <div class="tab" data-filter="ditolak">Ditolak</div>
+                    <div class="tab" data-filter="selesai">Selesai</div>
+                </div>
+                <div class="filters">
+                    <div class="search-box">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"/>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                        </svg>
+                        <input type="text" placeholder="Cari Kode Tiket" id="searchInput">
+                    </div>
+                    <select class="filter-select" id="kategoriFilter">
+                        <option value="">Kategori ▼</option>
+                        <option value="Simpan Pinjam">Simpan Pinjam</option>
+                        <option value="Kredit Bermasalah">Kredit Bermasalah</option>
+                        <option value="Pelayanan Koperasi">Pelayanan Koperasi</option>
+                        <option value="Manajemen / Kepengurusan">Manajemen / Kepengurusan</option>
+                        <option value="Aplikasi / Sistem Layanan">Aplikasi / Sistem Layanan</option>
+                    </select>
+                    <select class="filter-select" id="statusFilter">
+                        <option value="">Status ▼</option>
+                        <option value="Verifikasi">Butuh Verifikasi</option>
+                        <option value="Dalam Proses">Dalam Proses</option>
+                        <option value="Proses Mediasi">Proses Mediasi</option>
+                        <option value="Mekanisme Lain">Mekanisme Lain</option>
+                        <option value="Ditolak">Ditolak</option>
+                        <option value="Selesai">Selesai</option>
+                    </select>
+                    <div class="date-filter">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                            <line x1="16" y1="2" x2="16" y2="6"/>
+                            <line x1="8" y1="2" x2="8" y2="6"/>
+                            <line x1="3" y1="10" x2="21" y2="10"/>
+                        </svg>
+                        <input type="date" id="dateFilter" placeholder="Pilih Tanggal">
+                    </div>
+                    <button class="btn-print">
+                        <span>Print All</span>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="6 9 6 2 18 2 18 9"/>
+                            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+                            <rect x="6" y="14" width="12" height="8"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Kode Tiket</th>
+                            <th>Kategori</th>
+                            <th>Koperasi Tujuan</th>
+                            <th>Lokasi</th>
+                            <th>Ringkasan Pengaduan</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <!-- Data will be populated by JavaScript -->
+                    </tbody>
+                </table>
+                
+                <!-- Pagination -->
+                <div class="pagination-container">
+                    <div class="pagination-info">Showing 1 to 10 of 10 entries</div>
+                    <div class="pagination">
+                        <div class="rows-per-page">
+                            <span>Rows per page:</span>
+                            <select id="rowsPerPage">
+                                <option value="10">10</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                            </select>
+                        </div>
+                        <button class="pagination-btn">‹ Previous</button>
+                        <button class="pagination-btn active">1</button>
+                        <button class="pagination-btn">2</button>
+                        <button class="pagination-btn">3</button>
+                        <button class="pagination-btn">4</button>
+                        <button class="pagination-btn">...</button>
+                        <button class="pagination-btn">58067</button>
+                        <button class="pagination-btn">Next ›</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">Detail Laporan : <span id="modalTicketId">#KP-2025-0142</span></h2>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <!-- Data Pelapor -->
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <span class="detail-label">Nama Pelapor</span>
+                        <div class="detail-value" id="detailNama">Siti Karisma</div>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">NIK / Nomor Anggota</span>
+                        <div class="detail-value" id="detailNIK">0019918267484920</div>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Email</span>
+                        <div class="detail-value" id="detailEmail">Sitikarisma123@gmail.com</div>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Alamat</span>
+                        <div class="detail-value" id="detailAlamat">Jl. Bojong Soang, perumahan Podo...</div>
+                    </div>
+                </div>
+
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <span class="detail-label">Jenis Pengaduan</span>
+                        <div class="detail-value" id="detailJenis">Operasional KDKMP</div>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Lokasi Kejadian</span>
+                        <div class="detail-value" id="detailLokasi">Kab. Jombang</div>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Judul Pengaduan</span>
+                        <div class="detail-value" id="detailJudul">Keterlambatan Proses Validasi Simpa...</div>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Bukti Pengaduan</span>
+                        <div class="detail-value detail-value-btn">
+                            <span id="detailBukti">laporanlampiran.JPG</span>
+                            <button class="btn-lihat-semua">Lihat Semua</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kategori Pengaduan dari Matriks -->
+                <div class="detail-grid detail-grid-3" style="margin-bottom: 15px;">
+                    <div class="detail-item">
+                        <span class="detail-label">Main Directory</span>
+                        <div class="detail-value" id="detailMainDir">Kelembagaan Koperasi</div>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Sub Directory</span>
+                        <div class="detail-value" id="detailSubDir">Standar Operasional Prosedur (SOP)</div>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Klaster Pengaduan</span>
+                        <div class="detail-value" id="detailKlaster">SOP Usaha</div>
+                    </div>
+                </div>
+
+                <div class="detail-grid" style="grid-template-columns: repeat(2, 1fr);">
+                    <div class="detail-item">
+                        <span class="detail-label">Nominal Terkait</span>
+                        <div class="detail-value" id="detailNominal">Rp 5.000.000</div>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Tanggal Pengaduan</span>
+                        <div class="detail-value" id="detailTanggal">05/10/2025</div>
+                    </div>
+                </div>
+
+                <!-- Pertanyaan Tertutup yang Dipilih -->
+                <div class="section-title" style="margin-top: 20px;">Topik Pengaduan yang Dipilih:</div>
+                <div class="pertanyaan-box" id="pertanyaanTerpilih">
+                    <div class="pertanyaan-item">
+                        <div class="pertanyaan-check">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                        </div>
+                        <span class="pertanyaan-text">Tidak terdapat SOP evaluasi proposal</span>
+                    </div>
+                    <div class="pertanyaan-item">
+                        <div class="pertanyaan-check">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                        </div>
+                        <span class="pertanyaan-text">Tidak terdapat SOP pencairan dana</span>
+                    </div>
+                </div>
+
+                <!-- Keterangan Tambahan -->
+                <div class="section-title">Keterangan Tambahan:</div>
+                <div class="keterangan-box">
+                    <div class="detail-item">
+                        <span class="detail-label">Lama Masalah Terjadi</span>
+                        <div class="detail-value" id="detailLama">1-3 bulan</div>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Komunikasi Awal dengan Terlapor</span>
+                        <div class="detail-value" id="detailKomunikasi">Sudah, tapi tidak ada respon</div>
+                    </div>
+                </div>
+
+                <!-- Dampak -->
+                <div class="dampak-box">
+                    <div class="section-title">Dampak yang Dialami:</div>
+                    <div class="dampak-tags" id="dampakTags">
+                        <span class="dampak-tag">Tidak bisa menarik simpanan</span>
+                        <span class="dampak-tag">Kerugian finansial</span>
+                    </div>
+                </div>
+
+                <!-- Deskripsi Pengaduan -->
+                <div class="deskripsi-box">
+                    <div class="section-title">Deskripsi Pengaduan</div>
+                    <div class="deskripsi-content" id="detailDeskripsi">
+                        "Saya mengajukan pinjaman pada tanggal 5 Oktober 2025 melalui koperasi, namun hingga sekarang statusnya masih 'menunggu validasi'. Padahal semua berkas sudah saya unggah sesuai ketentuan, termasuk KTP, bukti keanggotaan, dan slip pembayaran terakhir. Saya sudah menanyakan ke pengurus, tapi diberitahu bahwa proses validasi dari sistem pusat sedang tertunda. Keterlambatan ini membuat rencana usaha saya terhambat karena dana belum bisa dicairkan sesuai jadwal. Mohon bantuan untuk mempercepat validasi atau memberikan penjelasan lebih lanjut terkait status pengajuan saya."
+                    </div>
+                </div>
+
+                <!-- Tetapkan Aksi -->
+                <div class="action-section">
+                    <div class="section-title">Tetapkan Aksi</div>
+                    <select class="action-select" id="actionSelect">
+                        <option value="">Pilih Status</option>
+                        <option value="dalam-proses-verifikasi">Dalam Proses Verifikasi</option>
+                        <option value="dalam-proses">Dalam Proses</option>
+                        <option value="proses-mediasi">Proses Mediasi</option>
+                        <option value="mekanisme-lain">Proses Mekanisme Lain</option>
+                        <option value="ditolak">Ditolak</option>
+                        <option value="selesai">Selesai</option>
+                    </select>
+
+                    <!-- Dynamic: Alasan Ditolak -->
+                    <div class="dynamic-section" id="sectionDitolak">
+                        <div class="section-title">Alasan Penolakan</div>
+                        <textarea class="form-textarea" id="alasanDitolak" placeholder="Tuliskan alasan penolakan pengaduan..."></textarea>
+                    </div>
+
+                    <!-- Dynamic: Selesai -->
+                    <div class="dynamic-section" id="sectionSelesai">
+                        <div class="section-title">Deskripsi Penyelesaian</div>
+                        <textarea class="form-textarea" id="deskripsiSelesai" placeholder="Tuliskan keterangan penyelesaian pengaduan..."></textarea>
+                        
+                        <div class="section-title" style="margin-top: 15px;">Input Lampiran</div>
+                        <div class="file-upload-area" id="fileUploadAreaAdmin">
+                            <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="12" y1="5" x2="12" y2="19"/>
+                                <line x1="5" y1="12" x2="19" y2="12"/>
+                            </svg>
+                            <p class="upload-text">Add File</p>
+                            <p class="upload-limit">Max 5 File</p>
+                            <input type="file" class="file-input" id="fileInputAdmin" multiple>
+                        </div>
+                        <div class="uploaded-files" id="uploadedFilesAdmin"></div>
+                    </div>
+                </div>
+
+                <!-- Log Admin -->
+                <div class="log-section">
+                    <div class="section-title">Log Admin</div>
+                    <table class="log-table">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Waktu / Bulan</th>
+                                <th>Nama Admin</th>
+                                <th>Perubahan terakhir</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="logTableBody">
+                            <tr>
+                                <td>1</td>
+                                <td>12 Des 2025, 09:00 Am</td>
+                                <td>Admin Sinta</td>
+                                <td>12 Des 2025, 09:00 Am</td>
+                                <td>Proses Verifikasi Berkas</td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>12 Des 2025, 09:00 Am</td>
+                                <td>Admin Rian</td>
+                                <td>12 Des 2025, 09:00 Am</td>
+                                <td>Diproses Tingkat Kota</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn-undo" onclick="closeModal()">Undo</button>
+                <button class="btn-simpan" onclick="saveAction()">Simpan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // Sample Data with detailed KDKMP information
+        const sampleData = [
+            {
+                id: 1,
+                kodeTiket: "#KP-2025-0142",
+                kategori: "Simpan Pinjam",
+                koperasiTujuan: "Koperasi Maju Sejahtera – Kab. Bandung",
+                lokasi: "Desa Wonogiri, Jawa Tengah",
+                ringkasan: "Pengaduan terkait penarikan simpanan...",
+                status: "Verifikasi",
+                namaPelapor: "Siti Karisma",
+                nik: "0019918267484992019",
+                email: "Sitikarisma123@gmail.com",
+                alamat: "Jl. Bojong Soang, perumahan Podomoro, Blok F2, No.03",
+                jenisPengaduan: "Operasional KDKMP",
+                lokasiKejadian: "Kab. Jombang",
+                judulPengaduan: "Keterlambatan Proses Validasi Simpanan",
+                buktiPengaduan: "laporanlampiran.JPG",
+                mainDirectory: "Kelembagaan Koperasi",
+                subDirectory: "Standar Operasional Prosedur (SOP)",
+                klasterPengaduan: "SOP Usaha",
+                pertanyaanTerpilih: [
+                    "Tidak terdapat SOP evaluasi proposal",
+                    "Tidak terdapat SOP pencairan dana"
+                ],
+                nominal: "Rp 5.000.000",
+                tanggalPengaduan: "05/10/2025",
+                lamaKejadian: "1-3 bulan",
+                komunikasiAwal: "Sudah, tapi tidak ada respon",
+                dampak: ["Tidak bisa menarik simpanan", "Kerugian finansial"],
+                deskripsi: "Saya mengajukan pinjaman pada tanggal 5 Oktober 2025 melalui koperasi, namun hingga sekarang statusnya masih 'menunggu validasi'. Padahal semua berkas sudah saya unggah sesuai ketentuan, termasuk KTP, bukti keanggotaan, dan slip pembayaran terakhir. Saya sudah menanyakan ke pengurus, tapi diberitahu bahwa proses validasi dari sistem pusat sedang tertunda. Keterlambatan ini membuat rencana usaha saya terhambat karena dana belum bisa dicairkan sesuai jadwal. Mohon bantuan untuk mempercepat validasi atau memberikan penjelasan lebih lanjut terkait status pengajuan saya.",
+                logAdmin: [
+                    { no: 1, waktu: "12 Des 2025, 09:00 Am", admin: "Admin Sinta", perubahan: "12 Des 2025, 09:00 Am", status: "Proses Verifikasi Berkas" },
+                    { no: 2, waktu: "12 Des 2025, 09:00 Am", admin: "Admin Rian", perubahan: "12 Des 2025, 09:00 Am", status: "Diproses Tingkat Kota" }
+                ]
+            },
+            {
+                id: 2,
+                kodeTiket: "#KP-2025-0138",
+                kategori: "Manajemen / Kepengurusan",
+                koperasiTujuan: "Koperasi Harapan Bersama – Kota Bekasi",
+                lokasi: "Desa Wonogiri, Jawa Tengah",
+                ringkasan: "Pelapor melaporkan adanya dugaan p...",
+                status: "Verifikasi",
+                namaPelapor: "Budi Santoso",
+                nik: "0019918267484992020",
+                email: "budisantoso@gmail.com",
+                alamat: "Jl. Merdeka No. 45, Bekasi",
+                jenisPengaduan: "Tata Kelola",
+                lokasiKejadian: "Kota Bekasi",
+                judulPengaduan: "Dugaan Penyimpangan Dana Koperasi",
+                buktiPengaduan: "bukti_transfer.pdf",
+                mainDirectory: "Kelayakan dan Kepatutan (Pengurus dan Pengawas)",
+                subDirectory: "Integritas dan Kompetensi",
+                klasterPengaduan: "Reputasi keuangan yang tidak mencukupi",
+                pertanyaanTerpilih: [
+                    "Memiliki kredit/pembiayaan macet (dalam SLIK OJK)",
+                    "Tidak menunjukkan komitmen untuk melakukan upaya yang diperlukan jika koperasi menghadapi masalah keuangan"
+                ],
+                nominal: "Rp 15.000.000",
+                tanggalPengaduan: "10/10/2025",
+                lamaKejadian: "3-6 bulan",
+                komunikasiAwal: "Sudah, tapi ditolak",
+                dampak: ["Kerugian finansial", "Layanan terhenti"],
+                deskripsi: "Saya menemukan adanya ketidaksesuaian dalam laporan keuangan koperasi...",
+                logAdmin: []
+            },
+            {
+                id: 3,
+                kodeTiket: "#KP-2025-0125",
+                kategori: "Kredit Bermasalah",
+                koperasiTujuan: "Koperasi Mandiri Jaya – Kab. Gresik",
+                lokasi: "Desa Wonogiri, Jawa Tengah",
+                ringkasan: "Pelapor mengajukan keberatan meng...",
+                status: "Verifikasi",
+                namaPelapor: "Dewi Lestari",
+                nik: "0019918267484992021",
+                email: "dewilestari@gmail.com",
+                alamat: "Jl. Pahlawan No. 12, Gresik",
+                jenisPengaduan: "Kredit",
+                lokasiKejadian: "Kab. Gresik",
+                judulPengaduan: "Keberatan Bunga Pinjaman",
+                buktiPengaduan: "slip_pembayaran.jpg",
+                mainDirectory: "Kebermanfaatan Koperasi",
+                subDirectory: "Manfaat bagi Anggota",
+                klasterPengaduan: "Aspek Administrasi dan Kompetisi",
+                pertanyaanTerpilih: [
+                    "Tidak terdapat pengumuman tertulis dan/atau publikasi perubahan tingkat suku bunga"
+                ],
+                nominal: "Rp 2.500.000",
+                tanggalPengaduan: "15/10/2025",
+                lamaKejadian: "< 1 minggu",
+                komunikasiAwal: "Belum pernah",
+                dampak: ["Kerugian finansial"],
+                deskripsi: "Saya keberatan dengan perhitungan bunga yang dibebankan...",
+                logAdmin: []
+            },
+            {
+                id: 4,
+                kodeTiket: "#KP-2025-0119",
+                kategori: "Aplikasi / Sistem Layanan",
+                koperasiTujuan: "Koperasi Nusantara Digital – Kota Semarang",
+                lokasi: "Desa Wonogiri, Jawa Tengah",
+                ringkasan: "Laporan terkait error pada aplikasi, na...",
+                status: "Verifikasi",
+                namaPelapor: "Ahmad Hidayat",
+                nik: "0019918267484992022",
+                email: "ahmadhidayat@gmail.com",
+                alamat: "Jl. Diponegoro No. 88, Semarang",
+                jenisPengaduan: "Sistem Digital",
+                lokasiKejadian: "Kota Semarang",
+                judulPengaduan: "Error Aplikasi Mobile",
+                buktiPengaduan: "screenshot_error.png",
+                mainDirectory: "Digitalisasi Sistem",
+                subDirectory: "Permasalahan dalam Sistem Komputasi & Data Pribadi",
+                klasterPengaduan: "Proses Input Data & Integrasi Data",
+                pertanyaanTerpilih: [
+                    "Kegagalan input data",
+                    "Gangguan layanan basis data"
+                ],
+                nominal: "Rp 0",
+                tanggalPengaduan: "20/10/2025",
+                lamaKejadian: "1-4 minggu",
+                komunikasiAwal: "Sudah, tapi tidak ada respon",
+                dampak: ["Akun diblokir", "Layanan terhenti"],
+                deskripsi: "Aplikasi mobile koperasi sering error saat melakukan transaksi...",
+                logAdmin: []
+            },
+            {
+                id: 5,
+                kodeTiket: "#KP-2025-0103",
+                kategori: "Pelayanan Koperasi",
+                koperasiTujuan: "Koperasi Mandala Sentosa – Kab. Tangerang",
+                lokasi: "Desa Wonogiri, Jawa Tengah",
+                ringkasan: "Pelapor mengeluhkan respon lambat te...",
+                status: "Verifikasi",
+                namaPelapor: "Rina Marlina",
+                nik: "0019918267484992023",
+                email: "rinamarlina@gmail.com",
+                alamat: "Jl. Raya Serpong No. 55, Tangerang",
+                jenisPengaduan: "Pelayanan",
+                lokasiKejadian: "Kab. Tangerang",
+                judulPengaduan: "Respon Lambat Pelayanan",
+                buktiPengaduan: "chat_history.pdf",
+                mainDirectory: "Kebermanfaatan Koperasi",
+                subDirectory: "Manfaat bagi Anggota",
+                klasterPengaduan: "Layanan kepada anggota",
+                pertanyaanTerpilih: [
+                    "Koperasi belum pernah memberikan bantuan aspek sosial pada anggota"
+                ],
+                nominal: "Rp 1.000.000",
+                tanggalPengaduan: "25/10/2025",
+                lamaKejadian: "1-3 bulan",
+                komunikasiAwal: "Sudah, tapi belum terselesaikan",
+                dampak: ["Layanan terhenti"],
+                deskripsi: "Pelayanan koperasi sangat lambat dalam merespon pengaduan...",
+                logAdmin: []
+            },
+            {
+                id: 6,
+                kodeTiket: "#KP-2025-0098",
+                kategori: "Pelayanan Koperasi",
+                koperasiTujuan: "Koperasi Mandala Sentosa – Kab. Tangerang",
+                lokasi: "Desa Wonogiri, Jawa Tengah",
+                ringkasan: "Pelapor mengeluhkan respon lambat te...",
+                status: "Dalam Proses",
+                namaPelapor: "Joko Widodo",
+                nik: "0019918267484992024",
+                email: "jokowidodo@gmail.com",
+                alamat: "Jl. Solo No. 10, Surakarta",
+                jenisPengaduan: "Pelayanan",
+                lokasiKejadian: "Surakarta",
+                judulPengaduan: "Keluhan Pelayanan",
+                buktiPengaduan: "bukti.jpg",
+                mainDirectory: "Kemitraan & Akselerasi Jaringan Usaha",
+                subDirectory: "Permasalahan dalam Kemitraan",
+                klasterPengaduan: "Kendala dalam aktivitas koperasi dengan mitra",
+                pertanyaanTerpilih: [
+                    "Komunikasi bisnis koperasi tidak berjalan dengan efektif"
+                ],
+                nominal: "Rp 3.000.000",
+                tanggalPengaduan: "01/11/2025",
+                lamaKejadian: "6-12 bulan",
+                komunikasiAwal: "Sudah, tapi tidak ada respon",
+                dampak: ["Kerugian finansial"],
+                deskripsi: "Sudah berbulan-bulan tidak ada tindak lanjut...",
+                logAdmin: []
+            },
+            {
+                id: 7,
+                kodeTiket: "#KP-2025-0092",
+                kategori: "Pelayanan Koperasi",
+                koperasiTujuan: "Koperasi Mandala Sentosa – Kab. Tangerang",
+                lokasi: "Desa Wonogiri, Jawa Tengah",
+                ringkasan: "Pelapor mengeluhkan respon lambat te...",
+                status: "Selesai",
+                namaPelapor: "Sri Mulyani",
+                nik: "0019918267484992025",
+                email: "srimulyani@gmail.com",
+                alamat: "Jl. Sudirman No. 100, Jakarta",
+                jenisPengaduan: "Administrasi",
+                lokasiKejadian: "Jakarta Pusat",
+                judulPengaduan: "Masalah Administrasi",
+                buktiPengaduan: "dokumen.pdf",
+                mainDirectory: "Kelembagaan Koperasi",
+                subDirectory: "Legalitas",
+                klasterPengaduan: "Legalitas Badan Hukum",
+                pertanyaanTerpilih: [
+                    "Tidak terdapat SK Pengesahan Badan Hukum"
+                ],
+                nominal: "Rp 0",
+                tanggalPengaduan: "05/11/2025",
+                lamaKejadian: "> 1 tahun",
+                komunikasiAwal: "Sudah, tapi ditolak",
+                dampak: ["Lainnya"],
+                deskripsi: "Permasalahan terkait legalitas koperasi...",
+                logAdmin: []
+            },
+            {
+                id: 8,
+                kodeTiket: "#KP-2025-0088",
+                kategori: "Pelayanan Koperasi",
+                koperasiTujuan: "Koperasi Mandala Sentosa – Kab. Tangerang",
+                lokasi: "Desa Wonogiri, Jawa Tengah",
+                ringkasan: "Pelapor mengeluhkan respon lambat te...",
+                status: "Selesai",
+                namaPelapor: "Anies Baswedan",
+                nik: "0019918267484992026",
+                email: "aniesbaswedan@gmail.com",
+                alamat: "Jl. Thamrin No. 50, Jakarta",
+                jenisPengaduan: "Pelayanan",
+                lokasiKejadian: "Jakarta Selatan",
+                judulPengaduan: "Keluhan Umum",
+                buktiPengaduan: "foto.jpg",
+                mainDirectory: "Digitalisasi Sistem",
+                subDirectory: "Permasalahan dalam Sistem Komputasi & Data Pribadi",
+                klasterPengaduan: "Perlindungan Data Pribadi",
+                pertanyaanTerpilih: [
+                    "Kebocoran data pengurus, pengawas, anggota dan karyawan"
+                ],
+                nominal: "Rp 0",
+                tanggalPengaduan: "10/11/2025",
+                lamaKejadian: "1-4 minggu",
+                komunikasiAwal: "Belum pernah",
+                dampak: ["Lainnya"],
+                deskripsi: "Data pribadi anggota bocor ke pihak luar...",
+                logAdmin: []
+            },
+            {
+                id: 9,
+                kodeTiket: "#KP-2025-0082",
+                kategori: "Pelayanan Koperasi",
+                koperasiTujuan: "Koperasi Mandala Sentosa – Kab. Tangerang",
+                lokasi: "Desa Wonogiri, Jawa Tengah",
+                ringkasan: "Pelapor mengeluhkan respon lambat te...",
+                status: "Selesai",
+                namaPelapor: "Ganjar Pranowo",
+                nik: "0019918267484992027",
+                email: "ganjarpranowo@gmail.com",
+                alamat: "Jl. Pemuda No. 77, Semarang",
+                jenisPengaduan: "Pelayanan",
+                lokasiKejadian: "Semarang",
+                judulPengaduan: "Keluhan Layanan",
+                buktiPengaduan: "bukti.png",
+                mainDirectory: "Kebermanfaatan Koperasi",
+                subDirectory: "Manfaat bagi masyarakat sekitar",
+                klasterPengaduan: "Aksesibilitas layanan koperasi",
+                pertanyaanTerpilih: [
+                    "Tidak terdapat gerai kantor koperasi",
+                    "Tidak terdapat gerai unit usaha simpan pinjam"
+                ],
+                nominal: "Rp 500.000",
+                tanggalPengaduan: "15/11/2025",
+                lamaKejadian: "1-3 bulan",
+                komunikasiAwal: "Sudah, tapi belum terselesaikan",
+                dampak: ["Tidak bisa menarik simpanan"],
+                deskripsi: "Tidak ada kantor koperasi di daerah kami...",
+                logAdmin: []
+            },
+            {
+                id: 10,
+                kodeTiket: "#KP-2025-0076",
+                kategori: "Pelayanan Koperasi",
+                koperasiTujuan: "Koperasi Mandala Sentosa – Kab. Tangerang",
+                lokasi: "Desa Wonogiri, Jawa Tengah",
+                ringkasan: "Pelapor mengeluhkan respon lambat te...",
+                status: "Selesai",
+                namaPelapor: "Ridwan Kamil",
+                nik: "0019918267484992028",
+                email: "ridwankamil@gmail.com",
+                alamat: "Jl. Asia Afrika No. 65, Bandung",
+                jenisPengaduan: "Pelayanan",
+                lokasiKejadian: "Bandung",
+                judulPengaduan: "Keluhan Pelayanan Koperasi",
+                buktiPengaduan: "lampiran.pdf",
+                mainDirectory: "Kebermanfaatan Koperasi",
+                subDirectory: "Manfaat bagi masyarakat sekitar",
+                klasterPengaduan: "Aspek Ketenagakerjaan",
+                pertanyaanTerpilih: [
+                    "Masih rendahnya penyerapan tenaga kerja meskipun pendapatan dan lingkup bisnis koperasi meningkat"
+                ],
+                nominal: "Rp 2.000.000",
+                tanggalPengaduan: "20/11/2025",
+                lamaKejadian: "3-6 bulan",
+                komunikasiAwal: "Sudah, tapi tidak ada respon",
+                dampak: ["Kerugian finansial", "Lainnya"],
+                deskripsi: "Koperasi tidak menyerap tenaga kerja lokal...",
+                logAdmin: []
+            }
+        ];
+
+        let currentData = [...sampleData];
+        let selectedReport = null;
+        let uploadedFilesAdmin = [];
+
+        // Initialize Table
+        function renderTable(data) {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+            
+            data.forEach((item, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${item.kodeTiket}</td>
+                    <td>${item.kategori}</td>
+                    <td>${item.koperasiTujuan}</td>
+                    <td>${item.lokasi}</td>
+                    <td>${item.ringkasan}</td>
+                    <td><span class="status-badge ${getStatusClass(item.status)}">${item.status}</span></td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn-go" onclick="openModal(${item.id})">Go</button>
+                            <button class="btn-download">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                    <polyline points="7 10 12 15 17 10"/>
+                                    <line x1="12" y1="15" x2="12" y2="3"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function getStatusClass(status) {
+            const statusMap = {
+                'Verifikasi': 'status-verifikasi',
+                'Dalam Proses': 'status-dalam-proses',
+                'Proses Mediasi': 'status-mediasi',
+                'Mekanisme Lain': 'status-mekanisme-lain',
+                'Ditolak': 'status-ditolak',
+                'Selesai': 'status-selesai'
+            };
+            return statusMap[status] || 'status-verifikasi';
+        }
+
+        // Open Modal
+        function openModal(id) {
+            selectedReport = sampleData.find(item => item.id === id);
+            if (!selectedReport) return;
+
+            // Populate modal with data
+            document.getElementById('modalTicketId').textContent = selectedReport.kodeTiket;
+            document.getElementById('detailNama').textContent = selectedReport.namaPelapor;
+            document.getElementById('detailNIK').textContent = selectedReport.nik;
+            document.getElementById('detailEmail').textContent = selectedReport.email;
+            document.getElementById('detailAlamat').textContent = selectedReport.alamat;
+            document.getElementById('detailJenis').textContent = selectedReport.jenisPengaduan;
+            document.getElementById('detailLokasi').textContent = selectedReport.lokasiKejadian;
+            document.getElementById('detailJudul').textContent = selectedReport.judulPengaduan;
+            document.getElementById('detailBukti').textContent = selectedReport.buktiPengaduan;
+            document.getElementById('detailMainDir').textContent = selectedReport.mainDirectory;
+            document.getElementById('detailSubDir').textContent = selectedReport.subDirectory;
+            document.getElementById('detailKlaster').textContent = selectedReport.klasterPengaduan;
+            document.getElementById('detailNominal').textContent = selectedReport.nominal;
+            document.getElementById('detailTanggal').textContent = selectedReport.tanggalPengaduan;
+            document.getElementById('detailLama').textContent = selectedReport.lamaKejadian;
+            document.getElementById('detailKomunikasi').textContent = selectedReport.komunikasiAwal;
+            document.getElementById('detailDeskripsi').textContent = `"${selectedReport.deskripsi}"`;
+
+            // Populate pertanyaan terpilih
+            const pertanyaanContainer = document.getElementById('pertanyaanTerpilih');
+            pertanyaanContainer.innerHTML = '';
+            selectedReport.pertanyaanTerpilih.forEach(p => {
+                pertanyaanContainer.innerHTML += `
+                    <div class="pertanyaan-item">
+                        <div class="pertanyaan-check">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                        </div>
+                        <span class="pertanyaan-text">${p}</span>
+                    </div>
+                `;
+            });
+
+            // Populate dampak
+            const dampakContainer = document.getElementById('dampakTags');
+            dampakContainer.innerHTML = '';
+            selectedReport.dampak.forEach(d => {
+                dampakContainer.innerHTML += `<span class="dampak-tag">${d}</span>`;
+            });
+
+            // Populate log admin
+            const logBody = document.getElementById('logTableBody');
+            logBody.innerHTML = '';
+            if (selectedReport.logAdmin.length > 0) {
+                selectedReport.logAdmin.forEach(log => {
+                    logBody.innerHTML += `
+                        <tr>
+                            <td>${log.no}</td>
+                            <td>${log.waktu}</td>
+                            <td>${log.admin}</td>
+                            <td>${log.perubahan}</td>
+                            <td>${log.status}</td>
+                        </tr>
+                    `;
+                });
+            } else {
+                logBody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #888;">Belum ada log aktivitas</td></tr>';
+            }
+
+            // Reset action select and dynamic sections
+            document.getElementById('actionSelect').value = '';
+            document.getElementById('sectionDitolak').classList.remove('show');
+            document.getElementById('sectionSelesai').classList.remove('show');
+            document.getElementById('alasanDitolak').value = '';
+            document.getElementById('deskripsiSelesai').value = '';
+            uploadedFilesAdmin = [];
+            document.getElementById('uploadedFilesAdmin').innerHTML = '';
+
+            document.getElementById('modalOverlay').classList.add('show');
+        }
+
+        // Close Modal
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.remove('show');
+            selectedReport = null;
+        }
+
+        // Handle Action Select Change
+        document.getElementById('actionSelect').addEventListener('change', function() {
+            const value = this.value;
+            const sectionDitolak = document.getElementById('sectionDitolak');
+            const sectionSelesai = document.getElementById('sectionSelesai');
+
+            // Hide all dynamic sections first
+            sectionDitolak.classList.remove('show');
+            sectionSelesai.classList.remove('show');
+
+            // Show relevant section based on selection
+            if (value === 'ditolak') {
+                sectionDitolak.classList.add('show');
+            } else if (value === 'selesai') {
+                sectionSelesai.classList.add('show');
+            }
+        });
+
+        // File Upload for Admin
+        document.getElementById('fileUploadAreaAdmin').addEventListener('click', function() {
+            document.getElementById('fileInputAdmin').click();
+        });
+
+        document.getElementById('fileInputAdmin').addEventListener('change', function(e) {
+            handleAdminFiles(e.target.files);
+        });
+
+        function handleAdminFiles(files) {
+            const maxFiles = 5;
+            if (uploadedFilesAdmin.length + files.length > maxFiles) {
+                showToast('Maksimal 5 file', 'error');
+                return;
+            }
+
+            Array.from(files).forEach(file => {
+                if (uploadedFilesAdmin.length < maxFiles) {
+                    uploadedFilesAdmin.push(file);
+                    displayAdminFile(file);
+                }
+            });
+        }
+
+        function displayAdminFile(file) {
+            const container = document.getElementById('uploadedFilesAdmin');
+            const fileEl = document.createElement('div');
+            fileEl.className = 'uploaded-file';
+            fileEl.innerHTML = `
+                <span>${file.name}</span>
+                <span class="remove-file" onclick="removeAdminFile('${file.name}', this)">✕</span>
+            `;
+            container.appendChild(fileEl);
+        }
+
+        function removeAdminFile(fileName, element) {
+            uploadedFilesAdmin = uploadedFilesAdmin.filter(f => f.name !== fileName);
+            element.parentElement.remove();
+        }
+
+        // Save Action
+        function saveAction() {
+            const action = document.getElementById('actionSelect').value;
+            
+            if (!action) {
+                showToast('Pilih status terlebih dahulu', 'error');
+                return;
+            }
+
+            if (action === 'ditolak') {
+                const alasan = document.getElementById('alasanDitolak').value;
+                if (!alasan.trim()) {
+                    showToast('Masukkan alasan penolakan', 'error');
+                    return;
+                }
+            }
+
+            if (action === 'selesai') {
+                const deskripsi = document.getElementById('deskripsiSelesai').value;
+                if (!deskripsi.trim()) {
+                    showToast('Masukkan deskripsi penyelesaian', 'error');
+                    return;
+                }
+            }
+
+            // Update status in data
+            const statusMap = {
+                'dalam-proses-verifikasi': 'Verifikasi',
+                'dalam-proses': 'Dalam Proses',
+                'proses-mediasi': 'Proses Mediasi',
+                'mekanisme-lain': 'Mekanisme Lain',
+                'ditolak': 'Ditolak',
+                'selesai': 'Selesai'
+            };
+
+            if (selectedReport) {
+                const index = sampleData.findIndex(item => item.id === selectedReport.id);
+                if (index !== -1) {
+                    sampleData[index].status = statusMap[action];
+                    renderTable(currentData);
+                }
+            }
+
+            showToast('Status berhasil diperbarui', 'success');
+            closeModal();
+        }
+
+        // Toast
+        function showToast(message, type) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type} show`;
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Tab Filtering
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                
+                const filter = this.dataset.filter;
+                if (filter === 'semua') {
+                    currentData = [...sampleData];
+                } else if (filter === 'verifikasi') {
+                    currentData = sampleData.filter(item => item.status === 'Verifikasi');
+                } else if (filter === 'dalam-proses') {
+                    currentData = sampleData.filter(item => item.status === 'Dalam Proses');
+                } else if (filter === 'ditolak') {
+                    currentData = sampleData.filter(item => item.status === 'Ditolak');
+                } else if (filter === 'selesai') {
+                    currentData = sampleData.filter(item => item.status === 'Selesai');
+                } else {
+                    currentData = [...sampleData];
+                }
+                renderTable(currentData);
+            });
+        });
+
+        // Search
+        document.getElementById('searchInput').addEventListener('input', function() {
+            const query = this.value.toLowerCase();
+            if (query) {
+                currentData = sampleData.filter(item => 
+                    item.kodeTiket.toLowerCase().includes(query) ||
+                    item.namaPelapor.toLowerCase().includes(query)
+                );
+            } else {
+                currentData = [...sampleData];
+            }
+            renderTable(currentData);
+        });
+
+        // Close modal when clicking overlay
+        document.getElementById('modalOverlay').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // Initialize
+        renderTable(sampleData);
+    </script>
+</body>
+</html>
